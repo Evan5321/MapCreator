@@ -1,0 +1,238 @@
+# kind 注册表：决定 label_mode / 默认 rank / 默认缩放区间 / 图标 / 颜色 token / 属性 schema
+# 与 docs/DATA_SPEC.md §8 必须一致（validate 会比对）。
+# 新增 kind 需同时提供：schemas/kinds/<kind>.schema.json、图标（point 类）、palette.toml token。
+
+# ---------- 自然 / 面状 ----------
+[kinds.continent]
+label_mode = "point"
+default_rank = 1
+default_min_zoom = 0.0
+default_max_zoom = 8.0
+color_token = "label.nature"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.ocean]
+label_mode = "point"
+default_rank = 1
+default_min_zoom = 0.0
+default_max_zoom = 7.0
+color_token = "label.water"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.sea]
+label_mode = "point"
+default_rank = 2
+default_min_zoom = 3.0
+default_max_zoom = 9.0
+color_token = "label.water"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.lake]
+label_mode = "point"
+default_rank = 3
+default_min_zoom = 8.0
+default_max_zoom = 14.0
+icon = "water"
+color_token = "label.water"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.island]
+label_mode = "point"
+default_rank = 3
+default_min_zoom = 5.0
+default_max_zoom = 12.0
+color_token = "label.nature"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.mountain_range]
+label_mode = "point"
+default_rank = 2
+default_min_zoom = 2.0
+default_max_zoom = 9.0
+color_token = "label.nature"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.peak]
+label_mode = "point"
+default_rank = 3
+default_min_zoom = 6.0
+default_max_zoom = 15.0
+icon = "mountain"
+color_token = "label.nature"
+attrs_schema = "schemas/kinds/peak.schema.json"
+
+[kinds.forest]
+label_mode = "point"
+default_rank = 4
+default_min_zoom = 8.0
+default_max_zoom = 14.0
+color_token = "label.nature"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+# ---------- 自然 / 线状 ----------
+[kinds.river]
+label_mode = "line"
+default_rank = 3
+default_min_zoom = 5.0
+default_max_zoom = 14.0
+color_token = "label.water"
+attrs_schema = "schemas/kinds/river.schema.json"
+
+# ---------- 人文 ----------
+[kinds.country]
+label_mode = "point"
+default_rank = 1
+default_min_zoom = 2.0
+default_max_zoom = 8.0
+color_token = "label.political"
+attrs_schema = "schemas/kinds/country.schema.json"
+
+[kinds.region]
+label_mode = "point"
+default_rank = 2
+default_min_zoom = 3.0
+default_max_zoom = 10.0
+color_token = "label.political"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.city]
+label_mode = "point"
+default_rank = 2
+default_min_zoom = 4.0
+default_max_zoom = 13.0
+icon = "city"
+color_token = "label.political"
+attrs_schema = "schemas/kinds/city.schema.json"
+
+[kinds.town]
+label_mode = "point"
+default_rank = 3
+default_min_zoom = 8.0
+default_max_zoom = 15.0
+icon = "town"
+color_token = "label.political"
+attrs_schema = "schemas/kinds/city.schema.json"
+
+[kinds.village]
+label_mode = "point"
+default_rank = 4
+default_min_zoom = 10.0
+default_max_zoom = 17.0
+color_token = "label.political"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.district]
+label_mode = "point"
+default_rank = 4
+default_min_zoom = 10.0
+default_max_zoom = 17.0
+color_token = "label.political"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.park]
+label_mode = "point"
+default_rank = 4
+default_min_zoom = 10.0
+default_max_zoom = 17.0
+icon = "park"
+color_token = "label.nature"
+attrs_schema = "schemas/kinds/park.schema.json"
+
+# ---------- 交通 ----------
+[kinds.metro_line]
+label_mode = "line"
+default_rank = 3
+default_min_zoom = 9.0
+default_max_zoom = 15.0
+color_token = "label.transit"
+attrs_schema = "schemas/kinds/transit.schema.json"
+
+[kinds.road]
+label_mode = "line"
+default_rank = 4
+default_min_zoom = 9.0
+default_max_zoom = 15.0
+color_token = "label.transit"
+attrs_schema = "schemas/kinds/road.schema.json"
+
+[kinds.station]
+label_mode = "point"
+default_rank = 4
+default_min_zoom = 11.0
+default_max_zoom = 17.0
+icon = "station"
+color_token = "label.transit"
+attrs_schema = "schemas/kinds/station.schema.json"
+
+[kinds.airport]
+label_mode = "point"
+default_rank = 4
+default_min_zoom = 10.0
+default_max_zoom = 17.0
+icon = "airport"
+color_token = "label.transit"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.port]
+label_mode = "point"
+default_rank = 4
+default_min_zoom = 10.0
+default_max_zoom = 17.0
+icon = "harbor"
+color_token = "label.transit"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+# ---------- 设施 / POI ----------
+[kinds.hospital]
+label_mode = "point"
+default_rank = 4
+default_min_zoom = 12.0
+default_max_zoom = 17.0
+icon = "hospital"
+color_token = "label.facility"
+attrs_schema = "schemas/kinds/hospital.schema.json"
+
+[kinds.school]
+label_mode = "point"
+default_rank = 4
+default_min_zoom = 12.0
+default_max_zoom = 17.0
+icon = "school"
+color_token = "label.facility"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.university]
+label_mode = "point"
+default_rank = 4
+default_min_zoom = 12.0
+default_max_zoom = 17.0
+icon = "college"
+color_token = "label.facility"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.museum]
+label_mode = "point"
+default_rank = 5
+default_min_zoom = 13.0
+default_max_zoom = 17.0
+icon = "museum"
+color_token = "label.facility"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.temple]
+label_mode = "point"
+default_rank = 5
+default_min_zoom = 13.0
+default_max_zoom = 17.0
+icon = "religious"
+color_token = "label.facility"
+attrs_schema = "schemas/kinds/_empty.schema.json"
+
+[kinds.market]
+label_mode = "point"
+default_rank = 5
+default_min_zoom = 13.0
+default_max_zoom = 17.0
+icon = "shop"
+color_token = "label.facility"
+attrs_schema = "schemas/kinds/_empty.schema.json"

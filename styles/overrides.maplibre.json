@@ -1,0 +1,9 @@
+{
+  "version": 8,
+  "metadata": {
+    "mapcreator:kind": "overrides",
+    "mapcreator:note": "人工覆盖项：构建顺序 base → generated → overrides。只写需要覆盖的层。"
+  },
+  "layers": [],
+  "sources": {}
+}

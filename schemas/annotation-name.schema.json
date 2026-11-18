@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mapcreator.local/schemas/annotation-name.schema.json",
+  "title": "AnnotationName",
+  "description": "多语言名称/别名。一个标注恰好一个 is_primary=1。",
+  "type": "object",
+  "required": ["lang", "name"],
+  "additionalProperties": false,
+  "properties": {
+    "annotation_id": { "type": "string", "pattern": "^anno\\.[a-z_]+(\\.[a-z0-9_]+)+$" },
+    "lang": {
+      "type": "string",
+      "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$",
+      "description": "BCP 47：zh / zh-Hant / en / ja …"
+    },
+    "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "role": { "enum": ["name", "alias"], "default": "name" },
+    "is_primary": { "type": "boolean", "default": false }
+  }
+}

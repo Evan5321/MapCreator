@@ -1,0 +1,16 @@
+{
+  "app.title": "MapCreator",
+  "status.loading": "加载中…",
+  "status.ready": "就绪",
+  "status.failed": "启动失败",
+  "search.placeholder": "搜索地名（中文/英文/别名）",
+  "search.empty": "没有匹配结果",
+  "detail.names": "名称",
+  "detail.description": "描述",
+  "detail.attributes": "属性",
+  "editor.save": "保存",
+  "editor.cancel": "取消",
+  "editor.delete": "删除",
+  "editor.conflict": "该要素已被修改，请刷新后重试",
+  "error.notImplemented": "功能尚未实现"
+}

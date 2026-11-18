@@ -1,0 +1,81 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mapcreator"
+version = "0.1.0"
+description = "本地优先、Python 主导、可缩放分级标注的架空世界地图工具"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "TBD" }
+dependencies = [
+    # 版本下限为写作时已知可用范围；精确版本由 uv.lock 锁定（TASK-0001 之后生成）
+    "typer>=0.12",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "geojson-pydantic>=1.1",
+    "shapely>=2.0",
+    "watchfiles>=0.22",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",
+    "playwright>=1.44",
+    "ruff>=0.5",
+    # mypy 2.x 在 Windows + Python 3.13 上初始化缓存时报
+    # `sqlite3.OperationalError: no such table: main.files2`（内部错误）；
+    # 在修复版本发布前锁定 1.x，避免 `check` 门禁无法执行。
+    "mypy>=1.10,<2",
+]
+
+[project.scripts]
+mapcreator = "mapcreator.cli:run"
+
+[tool.uv]
+# 国内镜像优先（清华 TUNA）。如需回退官方 PyPI，删除本节后重新 `uv lock`。
+[[tool.uv.index]]
+name = "tuna"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mapcreator"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+# RUF001/002/003 会把手写中文标点（，：；（））判为"歧义字符"，
+# 本项目文档与注释以中文为主，属于噪音，统一关闭。
+ignore = ["E501", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+# Typer 的选项必须写成 `typer.Option(...)` 作为默认值，B008 是该框架的固定误报。
+"src/mapcreator/cli.py" = ["B008"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]
+warn_unused_ignores = true
+no_implicit_optional = true
+# mypy 1.19+ 默认用 SQLite 存缓存并开启 WAL；本机 SQLite 3.50.4 的 WAL 写入会静默丢失，
+# 导致 `sqlite3.OperationalError: no such table: main.files2`。改用文件系统缓存。
+sqlite_cache = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "e2e: 需要 Playwright 与浏览器的端到端测试",
+    "perf: 性能基准，默认不在快速检查中运行",
+]

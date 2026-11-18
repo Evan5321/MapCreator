@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mapcreator.local/schemas/style-input.schema.json",
+  "title": "StyleInput",
+  "description": "样式生成的输入契约：base → generated → overrides，最终输出 build/style.json 并用 style-spec 校验。",
+  "type": "object",
+  "required": ["base", "overrides"],
+  "additionalProperties": false,
+  "properties": {
+    "base": { "$ref": "#/$defs/styleLayerPart" },
+    "generated": {
+      "type": "object",
+      "description": "由 Python 生成；不手工编辑",
+      "properties": {
+        "labels": { "type": "array", "items": { "type": "object" } },
+        "poi": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "overrides": {
+      "type": "object",
+      "properties": {
+        "layers": { "type": "array", "items": { "type": "object" } },
+        "sources": { "type": "object" },
+        "metadata": { "type": "object" }
+      }
+    }
+  },
+  "$defs": {
+    "styleLayerPart": {
+      "type": "object",
+      "properties": {
+        "version": { "const": 8 },
+        "name": { "type": "string" },
+        "sources": { "type": "object" },
+        "layers": { "type": "array", "items": { "type": "object" } },
+        "glyphs": { "type": "string" },
+        "sprite": { "type": "string" }
+      }
+    }
+  }
+}

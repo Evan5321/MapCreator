@@ -1,0 +1,45 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venv*/ 
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ---- Node / 前端 ----
+node_modules/
+web/dist/
+dist/
+.vite/
+
+# ---- 构建与运行产物 ----
+build/
+.tmp-build/
+artifacts/
+logs/
+backups/
+
+# ---- 数据库（真源是 annotations.sql）----
+world/annotations.db
+world/annotations.db-wal
+world/annotations.db-shm
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 本地环境 ----
+.env
+.env.local
+
+# ---- 生成的 API 契约（由 openapi 命令生成，视需要提交）----
+# docs/openapi.json

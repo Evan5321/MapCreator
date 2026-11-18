@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mapcreator.local/schemas/kinds/river.schema.json",
+  "title": "RiverAttrs",
+  "description": "河流的业务属性；宽度与几何走 GeoJSON properties（width_class），不在这里。",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "length_km": { "type": "number", "minimum": 0 },
+    "navigable": { "type": "boolean", "default": false },
+    "mouth": { "type": "string" },
+    "source": { "type": "string" }
+  }
+}

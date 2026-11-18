@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mapcreator.local/schemas/kinds/peak.schema.json",
+  "title": "PeakAttrs",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "elevation_m": { "type": "number", "minimum": 0 },
+    "prominence_m": { "type": "number", "minimum": 0 },
+    "first_ascent": { "type": "string" }
+  }
+}

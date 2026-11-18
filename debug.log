@@ -1,0 +1,7 @@
+[39544:1140:1118/234308.390:WARNING:t_skinfilemap.cpp(56)] SGRenderLog:CheckUpdate newMem.OpenMem failed, szNewMem:Local\sgime_skin.v2.filemap.sogouime err:系统错误2: The system cannot find the file specified.  
+打开Filemap失败: Local\sgime_skin.v2.filemap.sogouime3885eb6a977
+[39544:1140:1118/234308.390:WARNING:t_skinfilemap.cpp(65)] SGRenderLog:CheckUpdate finish: old version:1
+[39544:1140:1118/234308.390:WARNING:t_skinfilemap.cpp(67)] SGRenderLog:CheckUpdate finish: new version:2
+[39544:1140:1118/234308.582:WARNING:t_skinfilemap.cpp(63)] SGRenderLog:CheckUpdate newMem.OpenMem Suc, szNewMem:Local\sgime_skin.Dpi192.v2.filemap.sogouime
+[39544:1140:1118/234308.582:WARNING:t_skinfilemap.cpp(65)] SGRenderLog:CheckUpdate finish: old version:2
+[39544:1140:1118/234308.583:WARNING:t_skinfilemap.cpp(67)] SGRenderLog:CheckUpdate finish: new version:2

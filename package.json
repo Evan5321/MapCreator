@@ -1,0 +1,25 @@
+{
+  "name": "mapcreator-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MapCreator Web 前端（MapLibre + Terra Draw，原生 ES 模块）",
+  "scripts": {
+    "dev": "vite --config web/vite.config.js",
+    "build": "vite build --config web/vite.config.js",
+    "preview": "vite preview --config web/vite.config.js",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "check": "biome check ."
+  },
+  "dependencies": {
+    "maplibre-gl": "^4.7.1",
+    "terra-draw": "^1.0.0",
+    "@json-editor/json-editor": "^2.15.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "@biomejs/biome": "^1.8.3",
+    "@maplibre/maplibre-gl-style-spec": "^20.3.0"
+  }
+}

@@ -1,0 +1,57 @@
+:root {
+  --bg: #0b1020;
+  --fg: #f2e7d0;
+  --panel: #131a2e;
+  --border: #26304a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+#app {
+  position: relative;
+  height: 100%;
+}
+
+#map {
+  position: absolute;
+  inset: 0;
+}
+
+#sidebar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 320px;
+  max-height: calc(100% - 32px);
+  overflow: auto;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+#sidebar h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+#statusbar {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  padding: 4px 10px;
+  font-size: 12px;
+  background: rgb(0 0 0 / 55%);
+  border-radius: 4px;
+}

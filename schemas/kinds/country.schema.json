@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mapcreator.local/schemas/kinds/country.schema.json",
+  "title": "CountryAttrs",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "code": { "type": "string", "pattern": "^[A-Z]{2,4}$" },
+    "capital_id": { "type": "string", "pattern": "^anno\\." },
+    "population": { "type": "integer", "minimum": 0 },
+    "government": { "type": "string" }
+  }
+}

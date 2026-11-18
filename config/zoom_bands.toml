@@ -1,0 +1,39 @@
+# 缩放带：带边界是唯一权威（D-018）
+# 文件名由 name 派生：labels.<name>.geojson / lines.<name>.geojson / polygons.<name>.geojson
+# kinds.toml 的 default_min/max_zoom 只产生 style filter，绝不反推这里的边界。
+
+[[bands]]
+name = "z0-3"
+min_zoom = 0
+max_zoom = 3
+simplify_tolerance = 0.02
+
+[[bands]]
+name = "z4-6"
+min_zoom = 4
+max_zoom = 6
+simplify_tolerance = 0.01
+
+[[bands]]
+name = "z7-9"
+min_zoom = 7
+max_zoom = 9
+simplify_tolerance = 0.004
+
+[[bands]]
+name = "z10-12"
+min_zoom = 10
+max_zoom = 12
+simplify_tolerance = 0.001
+
+[[bands]]
+name = "z13-15"
+min_zoom = 13
+max_zoom = 15
+simplify_tolerance = 0.0002
+
+[[bands]]
+name = "z16-17"
+min_zoom = 16
+max_zoom = 17
+simplify_tolerance = 0.0

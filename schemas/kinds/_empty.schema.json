@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mapcreator.local/schemas/kinds/_empty.schema.json",
+  "title": "EmptyAttrs",
+  "description": "无业务属性的 kind 共用；attrs 必须为空对象。",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {}
+}

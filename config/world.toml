@@ -1,0 +1,25 @@
+# 世界配置（唯一来源：DATA_SPEC §1、D-013）
+# 修改后跑：uv run mapcreator validate
+
+[world]
+id = "aetheria"
+name = "Aetheria"
+
+# bounds 省略时由构建从全部几何 + 标注推导，并写入 build/manifest.json
+# 需要裁掉边缘数据时才显式写：[west, south, east, north]
+# bounds = [-30.0, -20.0, 30.0, 20.0]
+bounds_padding = 0.05
+
+# center 省略时取 bounds 中心
+default_zoom = 3.0
+min_zoom = 0.0
+max_zoom = 17.0
+
+# 仅用于比例尺近似显示，不参与真实距离计算
+planet_radius_km = 6371.0
+
+# 主显示语言；写入 annotations.db 的 meta.default_lang
+default_lang = "zh"
+
+# 允许的语种（用于 UI 语言选择与校验）
+languages = ["zh", "zh-Hant", "en"]

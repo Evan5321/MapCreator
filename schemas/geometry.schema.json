@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mapcreator.local/schemas/geometry.schema.json",
+  "title": "GeometryFeature",
+  "description": "world/geometry/*.geojson 中的单个 Feature。名称/等级等标注语义禁止出现。",
+  "type": "object",
+  "required": ["type", "id", "geometry", "properties"],
+  "additionalProperties": false,
+  "properties": {
+    "type": { "const": "Feature" },
+    "id": {
+      "type": "string",
+      "pattern": "^geo\\.[a-z_]+(\\.[a-z0-9_]+)+$",
+      "description": "geo.<kind>.<slug>"
+    },
+    "geometry": {
+      "type": "object",
+      "required": ["type", "coordinates"],
+      "properties": {
+        "type": {
+          "enum": ["Point", "LineString", "MultiLineString", "Polygon", "MultiPolygon"]
+        },
+        "coordinates": { "type": "array" }
+      }
+    },
+    "properties": {
+      "type": "object",
+      "required": ["kind"],
+      "minProperties": 1,
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "null"]
+      },
+      "not": {
+        "anyOf": [
+          { "required": ["name"] },
+          { "required": ["rank"] },
+          { "required": ["min_zoom"] },
+          { "required": ["description"] },
+          { "required": ["layer"] }
+        ]
+      }
+    }
+  }
+}

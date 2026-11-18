@@ -1,0 +1,17 @@
+{
+  "version": 8,
+  "name": "MapCreator Base",
+  "metadata": {
+    "mapcreator:kind": "base",
+    "mapcreator:note": "底图样式：手工/Maputnik 调优。生成文件请勿手工编辑 build/style.json。"
+  },
+  "glyphs": "/glyphs/{fontstack}/{range}.pbf",
+  "sources": {},
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": { "background-color": "#0b1020" }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mapcreator.local/schemas/kinds/station.schema.json",
+  "title": "StationAttrs",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "lines": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "platforms": { "type": "integer", "minimum": 0 },
+    "underground": { "type": "boolean", "default": false },
+    "opened_year": { "type": "integer", "minimum": 0 }
+  }
+}

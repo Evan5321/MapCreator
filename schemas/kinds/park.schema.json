@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mapcreator.local/schemas/kinds/park.schema.json",
+  "title": "ParkAttrs",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "area_km2": { "type": "number", "minimum": 0 },
+    "protected": { "type": "boolean", "default": false },
+    "operator": { "type": "string" },
+    "opened_year": { "type": "integer", "minimum": 0 }
+  }
+}

@@ -1,0 +1,37 @@
+# 可选 CI：本地 `mapcreator check --full` 才是硬要求。
+# 该工作流不含 QGIS/Docker/浏览器重任务，只做格式、类型、单测与数据校验。
+name: check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --all-groups
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy src
+      - run: uv run pytest tests/unit tests/integration -q
+      - run: uv run mapcreator validate --json
+        continue-on-error: true # TASK-0005 之前 validate 未实现
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build

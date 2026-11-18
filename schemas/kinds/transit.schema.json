@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mapcreator.local/schemas/kinds/transit.schema.json",
+  "title": "TransitLineAttrs",
+  "description": "地铁/公交/铁路线路。站点顺序用 relation_member，不放在 attrs。",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "mode": { "enum": ["metro", "bus", "rail"] },
+    "line_color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+    "operator": { "type": "string" },
+    "opened_year": { "type": "integer", "minimum": 0 }
+  }
+}
