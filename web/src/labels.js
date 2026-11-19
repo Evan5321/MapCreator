@@ -5,15 +5,26 @@
  */
 
 /**
- * @typedef {{ properties: { name?: string, kind?: string, rank?: number } }} LabelFeature
+ * @typedef {{
+ *   id?: string | number,
+ *   geometry: { coordinates: [number, number] },
+ *   properties: { name?: string, kind?: string, rank?: number },
+ * }} LabelFeature
  */
 
 /**
  * @param {import('maplibre-gl').Map} map
  * @param {{ typography: Record<string, number[]>, kinds: Record<string, { color?: string }> }} world
  * @param {(band: string) => Promise<{ features: LabelFeature[] }>} loadBand
+ * @param {{ onSelect?: (id: string) => void, getSelectedId?: () => string | null }} [options]
  */
-export function createLabelLayer(map, world, loadBand) {
+export function createLabelLayer(map, world, loadBand, options = {}) {
+  // 选中环放在标签层下面：地图画布之上、文字之下。
+  const ring = document.createElement('div');
+  ring.className = 'selection-ring';
+  ring.hidden = true;
+  map.getContainer().appendChild(ring);
+
   const host = document.createElement('div');
   host.className = 'label-layer';
   map.getContainer().appendChild(host);
@@ -44,7 +55,6 @@ export function createLabelLayer(map, world, loadBand) {
       const text = feature.properties.name || '';
       if (!text) continue;
       const size = sizeFor(feature.properties.rank ?? 3, zoom);
-      // @ts-ignore -- Point geometry
       const point = map.project(feature.geometry.coordinates);
       const w = text.length * size * 0.95 + 8;
       const h = size + 6;
@@ -52,11 +62,30 @@ export function createLabelLayer(map, world, loadBand) {
       if (rect.x < 4 || rect.y < 4 || rect.x + w > width - 4 || rect.y + h > height - 4) continue;
       if (taken.some((other) => overlaps(rect, other))) continue;
       taken.push(rect);
-      kept.push({ text, rect, size, kind: feature.properties.kind });
+      kept.push({
+        text,
+        rect,
+        size,
+        kind: feature.properties.kind,
+        id: feature.id === undefined ? null : String(feature.id),
+      });
+    }
+
+    const selectedId = options.getSelectedId?.() ?? null;
+    const selected = selectedId
+      ? features.find((feature) => String(feature.id) === selectedId)
+      : undefined;
+    if (selected) {
+      const point = map.project(selected.geometry.coordinates);
+      ring.style.left = `${point.x}px`;
+      ring.style.top = `${point.y}px`;
+      ring.hidden = false;
+    } else {
+      ring.hidden = true;
     }
 
     host.replaceChildren(
-      ...kept.map(({ text, rect, size, kind }) => {
+      ...kept.map(({ text, rect, size, kind, id }) => {
         const element = document.createElement('span');
         element.className = 'label';
         element.textContent = text;
@@ -64,6 +93,14 @@ export function createLabelLayer(map, world, loadBand) {
         element.style.top = `${rect.y + rect.h / 2}px`;
         element.style.fontSize = `${size}px`;
         if (kind && world.kinds[kind]?.color) element.style.color = world.kinds[kind].color;
+        if (id && id === selectedId) element.classList.add('is-selected');
+        if (id && options.onSelect) {
+          element.classList.add('is-clickable');
+          element.addEventListener('click', (event) => {
+            event.stopPropagation();
+            options.onSelect?.(id);
+          });
+        }
         return element;
       }),
     );

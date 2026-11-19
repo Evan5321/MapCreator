@@ -1,6 +1,6 @@
 # 项目状态（STATUS）
 
-- **当前里程碑**：M0（骨架与契约）——**TASK-0003 / TASK-0004 / TASK-0005 / TASK-0006 完成**，`serve` 可打开分级预览地图
+- **当前里程碑**：M1（浏览与分级标注）——**TASK-0003 ~ TASK-0007 完成**，`serve` 可浏览分级地图并点选查看详情
 - **最近更新**：2026-11-19
 - **维护规则**：每完成一个任务更新本文件；只写事实与证据，不写计划口号（计划在 `TODO.md`）。
 
@@ -60,11 +60,17 @@
   - 前端：[api.js](../web/src/api.js)、[map.js](../web/src/map.js)（MapLibre + hash 相机 + 相对 source 改写到 `/map/`）、[labels.js](../web/src/labels.js)（按带拉取标签、rank 排序、屏幕空间贪心碰撞）、[main.js](../web/src/main.js)（`window.__app` 探针、`#z/lat/lon` 写回与 hashchange 同步）。
   - 标签为 DOM 层（无字体 glyph，见 ADR-021）；标注点由 style circle 层按 zoom 过滤。
   - 测试：`tests/unit/test_style.py`、`tests/integration/test_server.py`。
+- **TASK-0007 详情与 URL 状态（2026-11-19）**：
+  - [server/routes.py](../src/mapcreator/server/routes.py)：新增 `GET /api/annotations/{id}`，名称/attrs/描述来自 SQLite（D-016）；`min_zoom/max_zoom` 为 NULL 时返回 kind 默认值（不回写库）；无库 503 `DB_MISSING`、坏库 503 `DB_UNREADABLE`、缺失 404 `ANNOTATION_NOT_FOUND`。
+  - [server/app.py](../src/mapcreator/server/app.py)：`create_app(db_path=...)`，默认 `world/annotations.db`。
+  - 前端：[ui.js](../web/src/ui.js) 详情面板（全部语种叠加、当前语种高亮、坐标/有效缩放/rank/几何/revision/attrs）；[map.js](../web/src/map.js) 点击查询与 `pointLayers`；[labels.js](../web/src/labels.js) 标签可点击、DOM 选中圆环（WebGL circle filter 在实测中未显示，改用 DOM 环，见 ADR-022）；[main.js](../web/src/main.js) `#z/lat/lon?sel=&lang=` 完整读写与 hashchange 同步、`window.__app.selectedId`。
+  - 测试：[test_server.py](../tests/integration/test_server.py) 覆盖详情 200（kind 默认 zoom）、404、503；详情库在 tmp 中通过 `repo.init_schema` + `upsert_annotation` 构造。
 
 ## 未完成 / 阻塞
 
 | 状态 | 项 | 影响 |
 |---|---|---|
+| 未做 | `#sel=` 的 Playwright E2E 断言（`window.__app.selectedId` 已就绪） | 目前靠手工浏览器验证，属 TASK-0011 |
 | 未做 | `check --full` / `screenshot` / `query` / `openapi` / `format` 仍为占位 | 返回 `NOT_IMPLEMENTED`（退出码 4），属 TASK-0008/0010/0011 |
 | 未做 | 每带几何裁剪与 source 卸载（当前几何为单一 `unified.geojson`） | 大数据量时的载荷/内存优化，属 TASK-0012 |
 | 未做 | 真实世界内容（`world/` 几何为空） | 真实 `build` 仅含 8 条标注点，暂无几何要素 |
@@ -83,12 +89,15 @@
 
 ## 下一步
 
-1. **TASK-0007**：详情与 URL 状态（点选、`#sel=`、`#lang=`）。
-2. **TASK-0008**：搜索与只读 SQL。
+1. **TASK-0008**：搜索与只读 SQL（`/api/search`、`/api/query`）。
+2. **TASK-0011**：Playwright E2E（`window.__app.selectedId` 断言、启动验证）。
 3. 人工项（可并行）：Chromium 启动验证、`ENVIRONMENT.md` 许可证核对、首次提交与 `git push -u origin main`。
 
 ## 最近证据
 
+- TASK-0007 门禁：`ruff format --check .` / `ruff check .` / `mypy src` 全绿；`uv run pytest -q` → `46 passed, 1 skipped`（跳过项为 TASK-0011 E2E；唯一 warning 来自 FastAPI TestClient 的第三方弃用提示）；`npm run check` 通过；`npm run build` 产出新 bundle。
+- TASK-0007 API：`/api/annotations/anno.city.silverrun` → 200（双语名称、`min_zoom 4 / max_zoom 13`）；`/api/annotations/anno.school.brook` → 200（`12/17`）；缺失 ID → 404 `ANNOTATION_NOT_FOUND`；`db_path` 不存在 → 503 `DB_MISSING`。
+- TASK-0007 浏览器：`http://127.0.0.1:8765/?v=9#13.00/8.55/12.08?sel=anno.school.brook&lang=en` → 侧栏标题 "Brook School"、ZH 溪畔小学 主名 / EN Brook School、显示缩放 z12–z17、点选圆环可见、状态栏 `z13-15 · z13.00 · Aetheria · 标签 1 · 选中 anno.school.brook`，地址栏保留 `sel`；截图 `c:\Users\liyunlin\AppData\Local\Temp\trae\screenshots\brook_school_selected.jpg`。
 - TASK-0006 门禁：`ruff format --check .` / `ruff check .` / `mypy src` 全绿；`uv run pytest -q` → `44 passed, 1 skipped`；`npm run check` → `Checked 14 files`；`npm run build` → `web/dist`（index + assets）。
 - 样式校验：`node` + `@maplibre/maplibre-gl-style-spec` → `style-spec OK`（`build/style.json`）。
 - 服务与数据：`/api/health` 200；`/api/world` 200（bounds=`[9.95, 6.95, 14.55, 11.05]`，6 带）；`/api/data/z4-6` 200；`/map/style.json`、`/map/unified.geojson`、`/` 均 200。

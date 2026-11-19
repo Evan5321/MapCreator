@@ -1,11 +1,13 @@
 """API 端点（契约见 docs/ARCHITECTURE.md §6）。
 
-M0 只实现只读端点：`/api/health`、`/api/world`、`/api/data/{band}`。
-详情/搜索/编辑端点分别在 TASK-0007 与编辑里程碑实现。
+M0 只实现只读端点：`/api/health`、`/api/world`、`/api/data/{band}`、`/api/annotations/{id}`。
+搜索/编辑端点分别在 TASK-0008 与编辑里程碑实现。
 """
 
 from __future__ import annotations
 
+import sqlite3
+from contextlib import closing
 from pathlib import Path
 from typing import Any
 
@@ -15,7 +17,9 @@ from fastapi.responses import FileResponse
 from .. import __version__
 from ..build import manifest as manifest_mod
 from ..config import AppConfig
+from ..db import repo
 from ..errors import MapCreatorError
+from ..models import Annotation
 
 
 def register_routes(
@@ -23,6 +27,7 @@ def register_routes(
     *,
     config: AppConfig,
     build_dir: Path,
+    db_path: Path,
     enable_edit: bool,
     enable_sql: bool,
 ) -> None:
@@ -102,6 +107,78 @@ def register_routes(
                 },
             )
         return FileResponse(path, media_type="application/geo+json")
+
+    @app.get("/api/annotations/{annotation_id}")
+    def annotation_detail(annotation_id: str) -> dict[str, Any]:
+        """标注详情（全部名称 + attrs + 有效 zoom）。名称只从 SQLite 读（D-016）。"""
+        annotation = _load_annotation(annotation_id)
+        kind = config.kinds.get(annotation.kind)
+        min_zoom = annotation.min_zoom
+        max_zoom = annotation.max_zoom
+        if kind is not None:
+            if min_zoom is None:
+                min_zoom = kind.default_min_zoom
+            if max_zoom is None:
+                max_zoom = kind.default_max_zoom
+        primary = annotation.primary_name
+        return {
+            "id": annotation.id,
+            "kind": annotation.kind,
+            "lon": annotation.lon,
+            "lat": annotation.lat,
+            "rank": annotation.rank,
+            "label_mode": annotation.label_mode,
+            "min_zoom": min_zoom,
+            "max_zoom": max_zoom,
+            "icon": annotation.icon,
+            "description": annotation.description,
+            "attrs": annotation.attrs,
+            "parent_id": annotation.parent_id,
+            "geometry_id": annotation.geometry_id,
+            "revision": annotation.revision,
+            "names": [name.model_dump() for name in annotation.names],
+            "primary_name": primary.name if primary is not None else None,
+            "default_lang": config.world.default_lang,
+            "color": config.palette.label_tokens[kind.color_token].color
+            if kind is not None
+            else None,
+        }
+
+    def _load_annotation(annotation_id: str) -> Annotation:
+        if not db_path.is_file():
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "code": "DB_MISSING",
+                    "message": f"标注库不存在：{db_path}",
+                    "path": str(db_path),
+                    "remediation": "先运行 `uv run mapcreator annotations import` 建库",
+                },
+            )
+        try:
+            with closing(repo.connect(db_path)) as conn:
+                annotation = repo.get_annotation(conn, annotation_id)
+        except sqlite3.Error as exc:
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "code": "DB_UNREADABLE",
+                    "message": f"标注库读取失败：{exc}",
+                    "path": str(db_path),
+                    "remediation": "检查数据库是否损坏；必要时从 world/annotations.sql 重建",
+                },
+            ) from exc
+        if annotation is None:
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "code": "ANNOTATION_NOT_FOUND",
+                    "message": f"标注不存在或已删除：{annotation_id}",
+                    "feature_id": annotation_id,
+                    "remediation": "核对 ID 是否来自 /api/data/{band} 的 feature.id",
+                },
+            )
+        return annotation
 
 
 def _build_id(build_dir: Path) -> str | None:

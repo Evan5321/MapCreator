@@ -115,3 +115,11 @@
 - Decision: TASK-0006 用 [web/src/labels.js](../web/src/labels.js)：按带拉取 `/api/data/{band}`，投影到屏幕坐标后做贪心碰撞剔除，标签为绝对定位 DOM；标注点仍由 style 的 circle 层渲染（每 kind 一层，`minzoom/maxzoom` 来自 `kinds.toml`）。
 - Consequences: 正向——零字体资源即可看到分级标签与碰撞；负向——标签量大时 DOM 性能与渐隐/anchor 能力弱于 symbol layer，TASK-0011/0012 需在字体方案确定后评估切回。
 - Alternatives: 自托管字体 glyph（需要下载/安装资源，规则禁止未批准的联网与安装）；用圆点代替文字（丢失名称信息）。
+
+### ADR-022: 选中高亮用 DOM 环，不用 WebGL filter 层
+
+- Status: accepted（2026-11-19）
+- Context: TASK-0007 先用 circle 图层 + `setFilter(['==', ['id'], selectedId])` 做选中高亮；实测该层不出现在画布上（`['id']` 过滤与 GeoJSON feature id 的组合未生效，具体原因未深挖），而详情面板与 URL 状态均正常。
+- Decision: 选中高亮改为 [web/src/labels.js](../web/src/labels.js) 中的 `.selection-ring` DOM 元素，位置由 `map.project` 计算并在标签重排时更新；标签层始终在其上方，圆点仍由样式 circle 层渲染。
+- Consequences: 正向——高亮稳定可见、与 DOM 标签共用坐标系、无额外 layer/filter 状态；负向——环不随地图画布导出（截图/静态导出需另行处理），且只覆盖当前带内可见标签。
+- Alternatives: 继续排查 `['id']` 过滤（时间成本高、收益仅为少一个 DOM 节点）；用 feature-state（需要 `promoteId` 并改构建产物）；把 `id` 写进 properties（破坏 ID 单一表达）。

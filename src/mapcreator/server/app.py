@@ -25,6 +25,7 @@ def create_app(
     root: Path | None = None,
     build_dir: Path | None = None,
     web_dist: Path | None = None,
+    db_path: Path | None = None,
 ) -> FastAPI:
     """构建应用实例（不在导入期创建全局 app）。"""
     config = load_config(root)
@@ -38,6 +39,7 @@ def create_app(
         app,
         config=config,
         build_dir=build_dir or config.root / "build",
+        db_path=db_path or config.root / "world" / "annotations.db",
         enable_edit=enable_edit,
         enable_sql=enable_sql,
     )

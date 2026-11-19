@@ -98,10 +98,16 @@
 
 ## M1 浏览与分级标注
 
-### `[ ]` TASK-0007 详情与 URL 状态
+### `[x]` TASK-0007 详情与 URL 状态
 
 - **Scope**：点选 → `/api/annotations/{id}` → 详情面板；`#sel=`；多语言显示 `#lang=`。
-- **Acceptance**：点选高亮、URL 可复制还原、多语言叠加正确；E2E 断言 `selectedId`。
+- **Acceptance**：
+  - [x] 点选（圆点或 DOM 标签）→ 侧栏详情 + 选中圆环；点空白处关闭。
+  - [x] `#z/lat/lon?sel=<id>&lang=<lang>` 可复制还原；选中后 hash 保留 `sel`。
+  - [x] 详情叠加全部语种名称，`#lang=` 决定标题语种（zh→溪畔小学 / en→Brook School）。
+  - [x] 详情含有效 zoom（NULL 回填 kind 默认，不回写库）、坐标、rank、几何、revision、attrs。
+  - [ ] E2E 断言 `selectedId`（`window.__app` 已暴露，属 TASK-0011 Playwright）。
+- **Evidence**：`/api/annotations/anno.school.brook` → 200（`min_zoom 12 / max_zoom 17`、双语名称）；缺失 ID → 404 `ANNOTATION_NOT_FOUND`；无 DB → 503 `DB_MISSING`；截图 `brook_school_selected.jpg`（侧栏 Brook School + 双语 + 圆环 + 状态栏 `选中 anno.school.brook`）。
 - **Deps**：TASK-0006
 
 ## M2 搜索与 SQL

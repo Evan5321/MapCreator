@@ -12,11 +12,12 @@ import { createLabelLayer } from './labels.js';
 export const BANDS = ['z0-3', 'z4-6', 'z7-9', 'z10-12', 'z13-15', 'z16-17'];
 
 /**
- * 建立地图并返回实例、世界元数据与标签层。
+ * 建立地图并返回实例、世界元数据、标签层与选中高亮。
  * @param {HTMLElement | null} container
  * @param {{ zoom?: number, center?: { lon: number, lat: number } }} [view]
+ * @param {{ onSelect?: (id: string) => void, getSelectedId?: () => string | null }} [options]
  */
-export async function initMap(container, view = {}) {
+export async function initMap(container, view = {}, options = {}) {
   if (!container) throw new Error('缺少 #map 容器');
 
   const world = await getWorld();
@@ -43,8 +44,10 @@ export async function initMap(container, view = {}) {
     });
   });
 
-  const labels = createLabelLayer(map, world, getBand);
-  return { map, world, labels };
+  const labels = createLabelLayer(map, world, getBand, options);
+  /** 点标注的样式图层 ID（点击查询用）。 */
+  const pointLayers = Object.keys(world.kinds).map((kind) => `annotation-${kind}`);
+  return { map, world, labels, pointLayers };
 }
 
 /**

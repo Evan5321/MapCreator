@@ -1,4 +1,4 @@
-"""集成：FastAPI 服务（/api/health、/api/world、/api/data/{band}、静态资源）。"""
+"""集成：FastAPI 服务（/api/health、/api/world、/api/data/{band}、/api/annotations/{id}、静态资源）。"""
 
 from __future__ import annotations
 
@@ -7,6 +7,8 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
+from mapcreator.db import repo
+from mapcreator.models import Annotation, AnnotationName
 from mapcreator.server.app import create_app
 
 MANIFEST = {
@@ -74,3 +76,57 @@ def test_missing_manifest_returns_503(tmp_path: Path) -> None:
     assert response.status_code == 503
     assert response.json()["detail"]["code"] == "MANIFEST_MISSING"
     assert client.get("/api/health").json()["build_id"] is None
+
+
+def _database(tmp_path: Path) -> Path:
+    path = tmp_path / "annotations.db"
+    conn = repo.connect(path, journal_mode="DELETE")
+    try:
+        repo.init_schema(conn, world_id="aetheria", default_lang="zh")
+        repo.upsert_annotation(
+            conn,
+            Annotation(
+                id="anno.city.silverrun",
+                kind="city",
+                lon=12.0,
+                lat=8.5,
+                rank=2,
+                names=[
+                    AnnotationName(lang="zh", name="银流城", is_primary=True),
+                    AnnotationName(lang="en", name="Silverrun"),
+                ],
+            ),
+        )
+    finally:
+        conn.close()
+    return path
+
+
+def test_annotation_detail(tmp_path: Path) -> None:
+    build, web = _layout(tmp_path)
+    client = TestClient(create_app(build_dir=build, web_dist=web, db_path=_database(tmp_path)))
+
+    response = client.get("/api/annotations/anno.city.silverrun")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == "anno.city.silverrun"
+    assert body["primary_name"] == "银流城"
+    assert body["default_lang"] == "zh"
+    # 库里 min_zoom/max_zoom 为 NULL → 详情返回 kind 默认值（D-018，不回写库）
+    assert body["min_zoom"] == 4.0
+    assert body["max_zoom"] == 13.0
+    assert body["color"]
+    assert {item["lang"] for item in body["names"]} == {"zh", "en"}
+
+    missing = client.get("/api/annotations/anno.city.nope")
+    assert missing.status_code == 404
+    assert missing.json()["detail"]["code"] == "ANNOTATION_NOT_FOUND"
+
+
+def test_annotation_detail_without_db(tmp_path: Path) -> None:
+    build, web = _layout(tmp_path)
+    client = TestClient(create_app(build_dir=build, web_dist=web, db_path=tmp_path / "absent.db"))
+
+    response = client.get("/api/annotations/anno.city.silverrun")
+    assert response.status_code == 503
+    assert response.json()["detail"]["code"] == "DB_MISSING"
