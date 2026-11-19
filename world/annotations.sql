@@ -1,0 +1,36 @@
+-- MapCreator annotations dump：只含逻辑表；FTS/RTree 由 db restore 重建。
+-- schema_version: 1
+BEGIN TRANSACTION;
+DELETE FROM relation_member;
+DELETE FROM relation;
+DELETE FROM annotation_name;
+DELETE FROM annotation;
+DELETE FROM meta;
+INSERT INTO meta(key, value) VALUES('default_lang', 'zh');
+INSERT INTO meta(key, value) VALUES('schema_version', '1');
+INSERT INTO meta(key, value) VALUES('world_id', 'aetheria');
+INSERT INTO annotation(fid, id, kind, search_text, parent_id, geometry_id, lon, lat, label_mode, rank, min_zoom, max_zoom, icon, description, attrs, revision, updated_at, deleted_at) VALUES(1, 'anno.city.silverrun', 'city', 'Silverrun 银流城', NULL, NULL, 12.0, 8.5, 'point', 2, NULL, NULL, NULL, NULL, '{}', 2, '2026-11-19T05:07:03+00:00', NULL);
+INSERT INTO annotation(fid, id, kind, search_text, parent_id, geometry_id, lon, lat, label_mode, rank, min_zoom, max_zoom, icon, description, attrs, revision, updated_at, deleted_at) VALUES(2, 'anno.city.emberhold', 'city', 'Emberhold 烬堡', NULL, NULL, 13.6, 9.2, 'point', 2, NULL, NULL, NULL, NULL, '{}', 2, '2026-11-19T05:07:03+00:00', NULL);
+INSERT INTO annotation(fid, id, kind, search_text, parent_id, geometry_id, lon, lat, label_mode, rank, min_zoom, max_zoom, icon, description, attrs, revision, updated_at, deleted_at) VALUES(3, 'anno.hospital.lumen', 'hospital', 'Lumen Hospital 流明医院', NULL, NULL, 12.05, 8.52, 'point', 4, NULL, NULL, NULL, NULL, '{}', 2, '2026-11-19T05:07:03+00:00', NULL);
+INSERT INTO annotation(fid, id, kind, search_text, parent_id, geometry_id, lon, lat, label_mode, rank, min_zoom, max_zoom, icon, description, attrs, revision, updated_at, deleted_at) VALUES(4, 'anno.school.brook', 'school', 'Brook School 溪畔小学', NULL, NULL, 12.08, 8.55, 'point', 4, NULL, NULL, NULL, NULL, '{}', 2, '2026-11-19T05:07:03+00:00', NULL);
+INSERT INTO annotation(fid, id, kind, search_text, parent_id, geometry_id, lon, lat, label_mode, rank, min_zoom, max_zoom, icon, description, attrs, revision, updated_at, deleted_at) VALUES(5, 'anno.museum.oldharbor', 'museum', 'Old Harbor Museum 旧港博物馆', NULL, NULL, 12.12, 8.58, 'point', 5, NULL, NULL, NULL, NULL, '{}', 2, '2026-11-19T05:07:03+00:00', NULL);
+INSERT INTO annotation(fid, id, kind, search_text, parent_id, geometry_id, lon, lat, label_mode, rank, min_zoom, max_zoom, icon, description, attrs, revision, updated_at, deleted_at) VALUES(6, 'anno.temple.dawn', 'temple', 'Dawn Shrine 晨曦祠', NULL, NULL, 12.15, 8.6, 'point', 5, NULL, NULL, NULL, NULL, '{}', 2, '2026-11-19T05:07:03+00:00', NULL);
+INSERT INTO annotation(fid, id, kind, search_text, parent_id, geometry_id, lon, lat, label_mode, rank, min_zoom, max_zoom, icon, description, attrs, revision, updated_at, deleted_at) VALUES(7, 'anno.market.copper', 'market', 'Copper Lane Market 铜巷市集', NULL, NULL, 12.18, 8.62, 'point', 5, NULL, NULL, NULL, NULL, '{}', 2, '2026-11-19T05:07:03+00:00', NULL);
+INSERT INTO annotation(fid, id, kind, search_text, parent_id, geometry_id, lon, lat, label_mode, rank, min_zoom, max_zoom, icon, description, attrs, revision, updated_at, deleted_at) VALUES(8, 'anno.metro_line.blue', 'metro_line', 'Blue Line 蓝线', NULL, 'geo.metro.blue', 12.6, 8.6, 'line', 3, NULL, NULL, NULL, NULL, '{}', 2, '2026-11-19T05:07:03+00:00', NULL);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.city.emberhold', 'en', 'Emberhold', 'name', 0);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.city.emberhold', 'zh', '烬堡', 'name', 1);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.city.silverrun', 'en', 'Silverrun', 'name', 0);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.city.silverrun', 'zh', '银流城', 'name', 1);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.hospital.lumen', 'en', 'Lumen Hospital', 'name', 0);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.hospital.lumen', 'zh', '流明医院', 'name', 1);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.market.copper', 'en', 'Copper Lane Market', 'name', 0);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.market.copper', 'zh', '铜巷市集', 'name', 1);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.metro_line.blue', 'en', 'Blue Line', 'name', 0);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.metro_line.blue', 'zh', '蓝线', 'name', 1);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.museum.oldharbor', 'en', 'Old Harbor Museum', 'name', 0);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.museum.oldharbor', 'zh', '旧港博物馆', 'name', 1);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.school.brook', 'en', 'Brook School', 'name', 0);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.school.brook', 'zh', '溪畔小学', 'name', 1);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.temple.dawn', 'en', 'Dawn Shrine', 'name', 0);
+INSERT INTO annotation_name(annotation_id, lang, name, role, is_primary) VALUES('anno.temple.dawn', 'zh', '晨曦祠', 'name', 1);
+COMMIT;

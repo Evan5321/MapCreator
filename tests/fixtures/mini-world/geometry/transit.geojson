@@ -1,0 +1,15 @@
+{
+  "type": "FeatureCollection",
+  "name": "transit",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "geo.metro.blue",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[12.1, 8.2], [12.6, 8.6], [13.1, 8.3], [13.5, 8.7]]
+      },
+      "properties": { "kind": "metro", "mode": "metro", "line_color": "#d94f4f" }
+    }
+  ]
+}

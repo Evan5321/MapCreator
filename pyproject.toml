@@ -61,6 +61,7 @@ ignore = ["E501", "RUF001", "RUF002", "RUF003"]
 "tests/**" = ["S101"]
 # Typer 的选项必须写成 `typer.Option(...)` 作为默认值，B008 是该框架的固定误报。
 "src/mapcreator/cli.py" = ["B008"]
+"src/mapcreator/cli_db.py" = ["B008"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -71,6 +72,11 @@ no_implicit_optional = true
 # mypy 1.19+ 默认用 SQLite 存缓存并开启 WAL；本机 SQLite 3.50.4 的 WAL 写入会静默丢失，
 # 导致 `sqlite3.OperationalError: no such table: main.files2`。改用文件系统缓存。
 sqlite_cache = false
+
+[[tool.mypy.overrides]]
+# shapely 自带类型标注不完整且未随包分发 .pyi；不新增 types-* 依赖，直接忽略其导入。
+module = ["shapely.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,313 @@
+{
+  "$defs": {
+    "LabelToken": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "title": "Color",
+          "type": "string"
+        }
+      },
+      "required": [
+        "color"
+      ],
+      "title": "LabelToken",
+      "type": "object"
+    },
+    "LabelsPalette": {
+      "additionalProperties": false,
+      "properties": {
+        "halo": {
+          "title": "Halo",
+          "type": "string"
+        },
+        "halo_width": {
+          "exclusiveMinimum": 0,
+          "title": "Halo Width",
+          "type": "number"
+        }
+      },
+      "required": [
+        "halo",
+        "halo_width"
+      ],
+      "title": "LabelsPalette",
+      "type": "object"
+    },
+    "LinePalette": {
+      "additionalProperties": false,
+      "properties": {
+        "rail_dash": {
+          "title": "Rail Dash",
+          "type": "string"
+        },
+        "river": {
+          "title": "River",
+          "type": "string"
+        },
+        "river_width_z12": {
+          "exclusiveMinimum": 0,
+          "title": "River Width Z12",
+          "type": "number"
+        },
+        "river_width_z7": {
+          "exclusiveMinimum": 0,
+          "title": "River Width Z7",
+          "type": "number"
+        },
+        "road": {
+          "title": "Road",
+          "type": "string"
+        },
+        "road_casing": {
+          "title": "Road Casing",
+          "type": "string"
+        },
+        "road_width_z14": {
+          "exclusiveMinimum": 0,
+          "title": "Road Width Z14",
+          "type": "number"
+        },
+        "road_width_z9": {
+          "exclusiveMinimum": 0,
+          "title": "Road Width Z9",
+          "type": "number"
+        }
+      },
+      "required": [
+        "river",
+        "river_width_z7",
+        "river_width_z12",
+        "road_casing",
+        "road",
+        "road_width_z9",
+        "road_width_z14",
+        "rail_dash"
+      ],
+      "title": "LinePalette",
+      "type": "object"
+    },
+    "PoiPalette": {
+      "additionalProperties": false,
+      "properties": {
+        "halo": {
+          "title": "Halo",
+          "type": "string"
+        },
+        "size_z12": {
+          "exclusiveMinimum": 0,
+          "title": "Size Z12",
+          "type": "integer"
+        },
+        "size_z15": {
+          "exclusiveMinimum": 0,
+          "title": "Size Z15",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "halo",
+        "size_z12",
+        "size_z15"
+      ],
+      "title": "PoiPalette",
+      "type": "object"
+    },
+    "SurfacePalette": {
+      "additionalProperties": false,
+      "properties": {
+        "background": {
+          "title": "Background",
+          "type": "string"
+        },
+        "land": {
+          "title": "Land",
+          "type": "string"
+        },
+        "land_border": {
+          "title": "Land Border",
+          "type": "string"
+        },
+        "park": {
+          "title": "Park",
+          "type": "string"
+        },
+        "terrain": {
+          "title": "Terrain",
+          "type": "string"
+        },
+        "water": {
+          "title": "Water",
+          "type": "string"
+        },
+        "water_border": {
+          "title": "Water Border",
+          "type": "string"
+        }
+      },
+      "required": [
+        "background",
+        "land",
+        "land_border",
+        "water",
+        "water_border",
+        "park",
+        "terrain"
+      ],
+      "title": "SurfacePalette",
+      "type": "object"
+    },
+    "TransitPalette": {
+      "additionalProperties": false,
+      "properties": {
+        "bus": {
+          "title": "Bus",
+          "type": "string"
+        },
+        "metro": {
+          "title": "Metro",
+          "type": "string"
+        },
+        "rail": {
+          "title": "Rail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metro",
+        "bus",
+        "rail"
+      ],
+      "title": "TransitPalette",
+      "type": "object"
+    },
+    "TypographyPalette": {
+      "additionalProperties": false,
+      "properties": {
+        "font_family": {
+          "minLength": 1,
+          "title": "Font Family",
+          "type": "string"
+        },
+        "rank1": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Rank1",
+          "type": "array"
+        },
+        "rank2": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Rank2",
+          "type": "array"
+        },
+        "rank3": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Rank3",
+          "type": "array"
+        },
+        "rank4": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Rank4",
+          "type": "array"
+        },
+        "rank5": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Rank5",
+          "type": "array"
+        }
+      },
+      "required": [
+        "font_family",
+        "rank1",
+        "rank2",
+        "rank3",
+        "rank4",
+        "rank5"
+      ],
+      "title": "TypographyPalette",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "label_tokens": {
+      "additionalProperties": {
+        "$ref": "#/$defs/LabelToken"
+      },
+      "title": "Label Tokens",
+      "type": "object"
+    },
+    "labels": {
+      "$ref": "#/$defs/LabelsPalette"
+    },
+    "line": {
+      "$ref": "#/$defs/LinePalette"
+    },
+    "poi": {
+      "$ref": "#/$defs/PoiPalette"
+    },
+    "surface": {
+      "$ref": "#/$defs/SurfacePalette"
+    },
+    "transit": {
+      "$ref": "#/$defs/TransitPalette"
+    },
+    "typography": {
+      "$ref": "#/$defs/TypographyPalette"
+    }
+  },
+  "required": [
+    "surface",
+    "line",
+    "transit",
+    "labels",
+    "poi",
+    "typography"
+  ],
+  "title": "PaletteConfig",
+  "type": "object"
+}

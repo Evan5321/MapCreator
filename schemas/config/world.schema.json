@@ -1,0 +1,98 @@
+{
+  "$defs": {
+    "WorldSection": {
+      "properties": {
+        "bounds": {
+          "anyOf": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bounds"
+        },
+        "bounds_padding": {
+          "default": 0.05,
+          "minimum": 0,
+          "title": "Bounds Padding",
+          "type": "number"
+        },
+        "default_lang": {
+          "default": "zh",
+          "title": "Default Lang",
+          "type": "string"
+        },
+        "default_zoom": {
+          "default": 3.0,
+          "title": "Default Zoom",
+          "type": "number"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "languages": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Languages",
+          "type": "array"
+        },
+        "max_zoom": {
+          "default": 17.0,
+          "title": "Max Zoom",
+          "type": "number"
+        },
+        "min_zoom": {
+          "default": 0.0,
+          "title": "Min Zoom",
+          "type": "number"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "planet_radius_km": {
+          "default": 6371.0,
+          "title": "Planet Radius Km",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "WorldSection",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "world": {
+      "$ref": "#/$defs/WorldSection"
+    }
+  },
+  "required": [
+    "world"
+  ],
+  "title": "WorldConfig",
+  "type": "object"
+}

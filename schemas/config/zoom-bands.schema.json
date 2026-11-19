@@ -1,0 +1,49 @@
+{
+  "$defs": {
+    "BandDef": {
+      "properties": {
+        "max_zoom": {
+          "minimum": 0,
+          "title": "Max Zoom",
+          "type": "integer"
+        },
+        "min_zoom": {
+          "minimum": 0,
+          "title": "Min Zoom",
+          "type": "integer"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "simplify_tolerance": {
+          "minimum": 0,
+          "title": "Simplify Tolerance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "min_zoom",
+        "max_zoom",
+        "simplify_tolerance"
+      ],
+      "title": "BandDef",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "bands": {
+      "items": {
+        "$ref": "#/$defs/BandDef"
+      },
+      "title": "Bands",
+      "type": "array"
+    }
+  },
+  "required": [
+    "bands"
+  ],
+  "title": "BandsConfig",
+  "type": "object"
+}

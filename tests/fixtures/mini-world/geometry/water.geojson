@@ -1,0 +1,17 @@
+{
+  "type": "FeatureCollection",
+  "name": "water",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "geo.sea.glasswater",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[10.0, 7.0], [10.95, 7.0], [10.95, 11.0], [10.0, 11.0], [10.0, 7.0]]
+        ]
+      },
+      "properties": { "kind": "sea", "water_class": "sea" }
+    }
+  ]
+}

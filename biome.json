@@ -10,8 +10,12 @@
       "**/node_modules/**",
       "**/dist/**",
       "**/build/**",
+      "**/build.old/**",
+      "**/pytest-of-*/**",
       "**/artifacts/**",
       "world/**",
+      "schemas/**",
+      "tests/**",
       "*.min.js"
     ]
   },

@@ -13,9 +13,10 @@ import tomllib
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator
 
-from .errors import ConfigurationError
+from .errors import ConfigurationError, config_error_from
+from .palette import PaletteConfig
 
 LabelMode = Literal["point", "line", "none"]
 
@@ -95,6 +96,9 @@ class BandsConfig(BaseModel):
     @model_validator(mode="after")
     def _contiguous(self) -> BandsConfig:
         ordered = sorted(self.bands, key=lambda b: b.min_zoom)
+        names = [band.name for band in ordered]
+        if len(names) != len(set(names)):
+            raise ValueError(f"缩放带 name 必须唯一：{names}")
         for prev, cur in itertools.pairwise(ordered):
             if cur.min_zoom != prev.max_zoom + 1:
                 raise ValueError(
@@ -111,7 +115,7 @@ class AppConfig(BaseModel):
     world: WorldSection
     kinds: dict[str, KindDef]
     bands: list[BandDef]
-    palette: dict[str, Any]
+    palette: PaletteConfig
 
 
 def load_toml(path: Path) -> dict[str, Any]:
@@ -134,33 +138,102 @@ def load_toml(path: Path) -> dict[str, Any]:
         ) from exc
 
 
+def _load_model[ModelT: BaseModel](model: type[ModelT], path: Path) -> ModelT:
+    """TOML → Pydantic 模型；校验失败转成带字段路径的 ConfigurationError。"""
+    try:
+        return model.model_validate(load_toml(path))
+    except ValidationError as exc:
+        raise config_error_from(exc, path) from exc
+
+
 def load_config(root: Path | None = None) -> AppConfig:
     """加载并交叉校验全部配置。root 为空时从源码位置向上找仓库根。"""
     base = root or find_repo_root()
     cfg_dir = base / "config"
 
-    world = WorldConfig.model_validate(load_toml(cfg_dir / "world.toml")).world
-    kinds_cfg = KindsConfig.model_validate(load_toml(cfg_dir / "kinds.toml"))
-    bands_cfg = BandsConfig.model_validate(load_toml(cfg_dir / "zoom_bands.toml"))
-    palette = load_toml(cfg_dir / "palette.toml")
+    world = _load_model(WorldConfig, cfg_dir / "world.toml").world
+    kinds_cfg = _load_model(KindsConfig, cfg_dir / "kinds.toml")
+    bands_cfg = _load_model(BandsConfig, cfg_dir / "zoom_bands.toml")
+    palette = _load_model(PaletteConfig, cfg_dir / "palette.toml")
+
+    world_path = cfg_dir / "world.toml"
+    kinds_path = cfg_dir / "kinds.toml"
+    bands_path = cfg_dir / "zoom_bands.toml"
+
+    if world.default_lang not in world.languages:
+        raise ConfigurationError(
+            code="CONFIG_INVALID",
+            message=f"world.toml:world.default_lang: {world.default_lang!r} 不在 languages 中",
+            path=world_path,
+            remediation="把 default_lang 加入 languages，或改成已列出的语种",
+        )
+    if len(set(world.languages)) != len(world.languages):
+        raise ConfigurationError(
+            code="CONFIG_INVALID",
+            message="world.toml:world.languages: 语种重复",
+            path=world_path,
+            remediation="删除重复项",
+        )
+
+    ordered_bands = sorted(bands_cfg.bands, key=lambda band: band.min_zoom)
+    if ordered_bands[0].min_zoom != world.min_zoom:
+        raise ConfigurationError(
+            code="BAND_COVERAGE_GAP",
+            message=(
+                f"zoom_bands.toml: 第一个带从 {ordered_bands[0].min_zoom} 开始，"
+                f"但 world.min_zoom 是 {world.min_zoom}"
+            ),
+            path=bands_path,
+            remediation="让缩放带从 world.min_zoom 开始连续覆盖",
+        )
 
     world_max = int(world.max_zoom)
-    last_band = max(bands_cfg.bands, key=lambda b: b.max_zoom)
+    last_band = ordered_bands[-1]
     if last_band.max_zoom < world_max:
         raise ConfigurationError(
             code="BAND_COVERAGE_GAP",
             message=f"缩放带最大覆盖 {last_band.max_zoom}，小于 world.max_zoom {world_max}",
-            path=cfg_dir / "zoom_bands.toml",
+            path=bands_path,
             remediation="增加一个覆盖到 world.max_zoom 的带",
         )
 
     for name, kind in kinds_cfg.kinds.items():
-        if kind.default_max_zoom > world_max:
+        if kind.default_max_zoom > world.max_zoom:
             raise ConfigurationError(
                 code="KIND_ZOOM_OUT_OF_RANGE",
-                message=f"kind {name} 的 default_max_zoom {kind.default_max_zoom} 超出 world.max_zoom {world_max}",
-                path=cfg_dir / "kinds.toml",
+                message=(
+                    f"kinds.toml:kinds.{name}.default_max_zoom: "
+                    f"{kind.default_max_zoom} 超出 world.max_zoom {world.max_zoom}"
+                ),
+                path=kinds_path,
                 remediation="把该 kind 的默认上限降到 world.max_zoom 以内",
+            )
+        if kind.default_min_zoom < world.min_zoom:
+            raise ConfigurationError(
+                code="KIND_ZOOM_OUT_OF_RANGE",
+                message=(
+                    f"kinds.toml:kinds.{name}.default_min_zoom: "
+                    f"{kind.default_min_zoom} 小于 world.min_zoom {world.min_zoom}"
+                ),
+                path=kinds_path,
+                remediation="把该 kind 的默认下限提到 world.min_zoom 以上",
+            )
+        if kind.color_token not in palette.label_tokens:
+            raise ConfigurationError(
+                code="KIND_COLOR_TOKEN_UNKNOWN",
+                message=(
+                    f"kinds.toml:kinds.{name}.color_token: "
+                    f"{kind.color_token!r} 未在 palette.toml 定义"
+                ),
+                path=kinds_path,
+                remediation='在 palette.toml 增加对应 ["label.<name>"] 条目，或改用已有 token',
+            )
+        if kind.attrs_schema is not None and not (base / kind.attrs_schema).is_file():
+            raise ConfigurationError(
+                code="KIND_ATTRS_SCHEMA_MISSING",
+                message=f"kinds.toml:kinds.{name}.attrs_schema: 找不到 {kind.attrs_schema}",
+                path=kinds_path,
+                remediation="补上 schemas/kinds/<kind>.schema.json，或改用已有 schema",
             )
 
     return AppConfig(

@@ -1,0 +1,17 @@
+{
+  "type": "FeatureCollection",
+  "name": "terrain",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "geo.mountain_range.cinder",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[12.3, 8.9], [13.4, 8.9], [13.4, 9.6], [12.3, 9.6], [12.3, 8.9]]
+        ]
+      },
+      "properties": { "kind": "mountain_range", "elev_class": 3 }
+    }
+  ]
+}

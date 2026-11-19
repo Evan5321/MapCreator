@@ -10,6 +10,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from pydantic import ValidationError
+
 
 @dataclass(slots=True)
 class MapCreatorError(Exception):
@@ -58,3 +60,49 @@ class NotImplementedYet(MapCreatorError):
             remediation=f"查看 TODO.md 中的 {task}",
             details={"feature": feature, "task": task},
         )
+
+
+def _issues(exc: ValidationError) -> list[dict[str, Any]]:
+    """把 pydantic 错误压平成可序列化的 `loc/msg/type` 清单。"""
+    return [
+        {
+            "loc": ".".join(str(part) for part in err["loc"]),
+            "msg": err["msg"],
+            "type": err["type"],
+        }
+        for err in exc.errors(include_url=False)
+    ]
+
+
+def config_error_from(exc: ValidationError, path: Path) -> ConfigurationError:
+    """配置模型校验失败 → 带**字段路径**的 ConfigurationError（退出码 2）。"""
+    issues = _issues(exc)
+    first = issues[0] if issues else {"loc": "", "msg": "校验失败"}
+    return ConfigurationError(
+        code="CONFIG_INVALID",
+        message=f"{path.name}:{first['loc']}: {first['msg']}",
+        path=path,
+        remediation="按 docs/DATA_SPEC.md 与本文件注释修正该字段",
+        details={"issues": issues},
+    )
+
+
+def data_error_from(
+    exc: ValidationError,
+    *,
+    path: Path,
+    feature_id: str | None = None,
+    index: int | None = None,
+) -> DataValidationError:
+    """数据模型校验失败 → 带文件、要素 ID 与字段路径的 DataValidationError（退出码 1）。"""
+    issues = _issues(exc)
+    first = issues[0] if issues else {"loc": "", "msg": "校验失败"}
+    location = path.name if index is None else f"{path.name}#{index}"
+    return DataValidationError(
+        code="SCHEMA_INVALID",
+        message=f"{location}:{first['loc']}: {first['msg']}",
+        path=path,
+        feature_id=feature_id,
+        remediation="按 docs/DATA_SPEC.md 与 schemas/ 修正该要素",
+        details={"issues": issues, "index": index},
+    )

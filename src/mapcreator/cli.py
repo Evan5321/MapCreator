@@ -1,12 +1,7 @@
 """CLI 入口（Typer）。
 
-骨架阶段：所有子命令已注册，但行为统一为 `NotImplementedYet`，
-退出码 4 + `code: NOT_IMPLEMENTED`，指向 TODO.md 中的具体任务。
-这样 `mapcreator --help` 与命令清单从第一天起就是稳定契约。
-
-统一 JSON 输出（AGENTS.md §3）：
-    ok / command / duration_ms / errors[] / warnings[] / artifacts[]
-退出码：0 成功、1 数据失败、2 用法/配置错误、3 环境缺失、4 内部错误/未实现。
+所有子命令共用 `cli_support` 的统一 JSON 输出与退出码；
+未实现的子命令返回 `code: NOT_IMPLEMENTED`（退出码 4）并指向 TODO.md。
 """
 
 from __future__ import annotations
@@ -15,89 +10,35 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Any
 
 import typer
 
 from . import __version__
 from . import doctor as doctor_mod
-from .errors import ConfigurationError, DataValidationError, EnvironmentError_, MapCreatorError
+from .build import pipeline as build_pipeline
+from .cli_db import annotations_app, db_app
+from .cli_support import (
+    EXIT_ENV,
+    EXIT_INTERNAL,
+    EXIT_OK,
+    exit_code_for,
+    finish,
+    todo,
+)
+from .config import load_config
+from .data.world import describe_world
+from .errors import MapCreatorError
+from .schema_export import export_schemas
 
 app = typer.Typer(
     add_completion=False,
     no_args_is_help=True,
     help="MapCreator：本地优先、Python 主导、可缩放分级标注的架空世界地图工具。",
 )
-db_app = typer.Typer(
-    no_args_is_help=True, help="数据库维护：dump / restore / verify-dump / migrate。"
-)
-annotations_app = typer.Typer(no_args_is_help=True, help="标注导入导出。")
 geometry_app = typer.Typer(no_args_is_help=True, help="几何导入导出。")
 app.add_typer(db_app, name="db")
 app.add_typer(annotations_app, name="annotations")
 app.add_typer(geometry_app, name="geometry")
-
-EXIT_OK = 0
-EXIT_DATA = 1
-EXIT_USAGE = 2
-EXIT_ENV = 3
-EXIT_INTERNAL = 4
-
-
-def _exit_code_for(exc: MapCreatorError) -> int:
-    if isinstance(exc, ConfigurationError):
-        return EXIT_USAGE
-    if isinstance(exc, DataValidationError):
-        return EXIT_DATA
-    if isinstance(exc, EnvironmentError_):
-        return EXIT_ENV
-    return EXIT_INTERNAL
-
-
-def _finish(
-    command: str,
-    *,
-    as_json: bool,
-    started: float,
-    errors: list[dict[str, Any]] | None = None,
-    warnings: list[str] | None = None,
-    artifacts: list[str] | None = None,
-    extra: dict[str, Any] | None = None,
-    exit_code: int = EXIT_OK,
-) -> None:
-    payload: dict[str, Any] = {
-        "ok": exit_code == EXIT_OK,
-        "command": command,
-        "version": __version__,
-        "duration_ms": round((time.perf_counter() - started) * 1000, 3),
-        "errors": errors or [],
-        "warnings": warnings or [],
-        "artifacts": artifacts or [],
-    }
-    if extra:
-        payload.update(extra)
-    if as_json:
-        typer.echo(json.dumps(payload, ensure_ascii=False, indent=2))
-    elif payload["ok"]:
-        typer.echo(f"✓ {command} 完成（{payload['duration_ms']} ms）")
-    else:
-        for err in payload["errors"]:
-            typer.secho(f"✗ {err.get('code')}: {err.get('message')}", fg="red", err=True)
-            if err.get("remediation"):
-                typer.echo(f"  修复建议：{err['remediation']}", err=True)
-    raise typer.Exit(code=exit_code)
-
-
-def _todo(command: str, feature: str, task: str, as_json: bool) -> None:
-    """骨架阶段占位：统一产出可解析的 JSON，而不是 traceback。"""
-    started = time.perf_counter()
-    err = MapCreatorError(
-        code="NOT_IMPLEMENTED",
-        message=f"{feature} 尚未实现（{command}）",
-        remediation=f"见 TODO.md 的 {task}",
-        details={"task": task},
-    ).to_dict()
-    _finish(command, as_json=as_json, started=started, errors=[err], exit_code=EXIT_INTERNAL)
 
 
 @app.callback()
@@ -134,7 +75,7 @@ def doctor(json_output: bool = typer.Option(False, "--json", help="结构化 JSO
     if not json_output:
         for line in doctor_mod.render_lines(checks):
             typer.echo(line)
-    _finish(
+    finish(
         "doctor",
         as_json=json_output,
         started=started,
@@ -146,28 +87,159 @@ def doctor(json_output: bool = typer.Option(False, "--json", help="结构化 JSO
 
 
 @app.command()
-def describe(json_output: bool = typer.Option(False, "--json")) -> None:
-    """世界概览：bounds、kind 清单、要素/标注计数。"""
-    _todo("describe", "世界概览", "TASK-0003", json_output)
+def describe(
+    root: Path | None = typer.Option(None, "--root", help="世界数据目录（默认 <仓库根>/world）。"),
+    json_output: bool = typer.Option(False, "--json"),
+) -> None:
+    """世界概览：bounds、kind 清单、要素/标注计数。只读，不写任何产物。"""
+    started = time.perf_counter()
+    try:
+        config = load_config()
+        data_root = root if root is not None else config.root / "world"
+        payload = describe_world(config, data_root)
+    except MapCreatorError as exc:
+        finish(
+            "describe",
+            as_json=json_output,
+            started=started,
+            errors=[exc.to_dict()],
+            exit_code=exit_code_for(exc),
+        )
+
+    warnings: list[str] = []
+    if payload["bounds"] is None:
+        warnings.append("没有几何或标注，无法推导 bounds（可在 config/world.toml 显式指定）")
+    if not json_output:
+        bounds = payload["bounds"]
+        typer.echo(f"世界：{payload['world']['name']}（{payload['world']['id']}）")
+        typer.echo(
+            "bounds：" + ("未定义" if bounds is None else ", ".join(f"{v:.6f}" for v in bounds))
+        )
+        counts = payload["counts"]
+        typer.echo(f"几何：{counts['geometry_total']} 条；标注：{counts['annotation_total']} 个")
+    finish(
+        "describe",
+        as_json=json_output,
+        started=started,
+        warnings=warnings,
+        extra=payload,
+    )
+
+
+@app.command(name="schema")
+def schema_command(
+    out: Path = typer.Option(Path("schemas"), "--out", help="输出目录。"),
+    json_output: bool = typer.Option(False, "--json"),
+) -> None:
+    """从 Pydantic 模型导出 JSON Schema（生成物，禁止手改）。"""
+    started = time.perf_counter()
+    try:
+        written = export_schemas(out)
+    except OSError as exc:
+        finish(
+            "schema",
+            as_json=json_output,
+            started=started,
+            errors=[
+                {
+                    "code": "SCHEMA_WRITE_FAILED",
+                    "message": f"写入 schema 失败：{exc}",
+                    "path": str(out),
+                    "feature_id": None,
+                    "details": {},
+                    "remediation": "确认输出目录可写",
+                }
+            ],
+            exit_code=4,
+        )
+    finish(
+        "schema",
+        as_json=json_output,
+        started=started,
+        artifacts=[path.as_posix() for path in written],
+    )
 
 
 @app.command()
 def validate(
     fix: bool = typer.Option(False, "--fix", help="允许 shapely.make_valid 修复并记录警告。"),
+    root: Path | None = typer.Option(None, "--root", help="世界数据目录（默认 <仓库根>/world）。"),
     json_output: bool = typer.Option(False, "--json"),
 ) -> None:
     """只校验真源，不写任何产物。"""
-    _todo("validate", f"数据校验（fix={fix}）", "TASK-0005", json_output)
+    started = time.perf_counter()
+    try:
+        config = load_config()
+        payload = build_pipeline.validate(config, data_root=root)
+    except MapCreatorError as exc:
+        finish(
+            "validate",
+            as_json=json_output,
+            started=started,
+            errors=[exc.to_dict()],
+            exit_code=exit_code_for(exc),
+        )
+
+    warnings = list(payload["warnings"])
+    if fix:
+        warnings.append("--fix 尚未接入自动修复；本次只做只读校验")
+    if not json_output:
+        counts = payload["counts"]
+        typer.echo(
+            f"{payload['world']['name']}：几何 {counts['geometry_total']} 条，"
+            f"标注 {counts['annotation_total']} 个"
+        )
+    finish(
+        "validate",
+        as_json=json_output,
+        started=started,
+        warnings=warnings,
+        extra=payload,
+    )
 
 
 @app.command()
 def build(
     clean: bool = typer.Option(False, "--clean"),
     watch: bool = typer.Option(False, "--watch"),
+    root: Path | None = typer.Option(None, "--root", help="世界数据目录（默认 <仓库根>/world）。"),
+    out: Path | None = typer.Option(None, "--out", help="构建输出目录（默认 <仓库根>/build）。"),
     json_output: bool = typer.Option(False, "--json"),
 ) -> None:
     """构建 build/（原子发布）。"""
-    _todo("build", f"构建（clean={clean}, watch={watch}）", "TASK-0005", json_output)
+    started = time.perf_counter()
+    if watch:
+        todo("build --watch", "监听并增量构建", "TASK-0012", json_output)
+
+    try:
+        config = load_config()
+        payload = build_pipeline.run(config, data_root=root, out_dir=out, clean=clean)
+    except MapCreatorError as exc:
+        finish(
+            "build",
+            as_json=json_output,
+            started=started,
+            errors=[exc.to_dict()],
+            exit_code=exit_code_for(exc),
+        )
+
+    manifest = payload["manifest"]
+    artifacts = [f"{payload['build_dir']}/{item['path']}" for item in manifest["files"]]
+    artifacts.append(f"{payload['build_dir']}/manifest.json")
+    if not json_output:
+        counts = manifest["counts"]
+        typer.echo(
+            f"构建完成：{payload['build_dir']}（几何 {counts['geometry_total']}，"
+            f"标注 {counts['annotation_total']}，build_version={manifest['build_version']}）"
+        )
+    finish(
+        "build",
+        as_json=json_output,
+        started=started,
+        warnings=payload["warnings"],
+        extra={"build_dir": payload["build_dir"], "manifest": manifest},
+        artifacts=artifacts,
+    )
 
 
 @app.command()
@@ -179,12 +251,17 @@ def serve(
     enable_sql: bool = typer.Option(False, "--enable-sql"),
 ) -> None:
     """启动本地应用（默认 http://127.0.0.1:8765）。"""
-    _todo(
-        "serve",
-        f"本地服务（host={host}, port={port}, dev={dev}, edit={enable_edit}, sql={enable_sql}）",
-        "TASK-0006",
-        True,
-    )
+    from .server import app as server_app
+
+    typer.echo(f"MapCreator → http://{host}:{port}")
+    try:
+        server_app.run(host, port, dev=dev, enable_edit=enable_edit, enable_sql=enable_sql)
+    except MapCreatorError as exc:
+        typer.secho(json.dumps(exc.to_dict(), ensure_ascii=False), fg="red", err=True)
+        raise typer.Exit(code=exit_code_for(exc)) from exc
+    except OSError as exc:
+        typer.secho(f"启动失败：{exc}", fg="red", err=True)
+        raise typer.Exit(code=EXIT_INTERNAL) from exc
 
 
 @app.command()
@@ -193,7 +270,7 @@ def check(
     json_output: bool = typer.Option(False, "--json"),
 ) -> None:
     """质量门禁。"""
-    _todo("check", f"质量检查（full={full}）", "TASK-0011", json_output)
+    todo("check", f"质量检查（full={full}）", "TASK-0011", json_output)
 
 
 @app.command()
@@ -202,7 +279,7 @@ def screenshot(
     out: Path = typer.Option(Path("artifacts/shot.png"), "--out"),
 ) -> None:
     """用 Playwright 截图（证据留存）。"""
-    _todo("screenshot", f"截图（{url} → {out}）", "TASK-0011", True)
+    todo("screenshot", f"截图（{url} → {out}）", "TASK-0011", True)
 
 
 @app.command()
@@ -211,19 +288,19 @@ def query(
     json_output: bool = typer.Option(False, "--json"),
 ) -> None:
     """只读 SQL 查询（仅 SELECT/WITH）。"""
-    _todo("query", "只读 SQL", "TASK-0008", json_output)
+    todo("query", "只读 SQL", "TASK-0008", json_output)
 
 
 @app.command()
 def setup(json_output: bool = typer.Option(False, "--json")) -> None:
     """幂等地准备前端构建产物与本地数据目录。"""
-    _todo("setup", "初始化", "TASK-0002", json_output)
+    todo("setup", "初始化", "TASK-0002", json_output)
 
 
 @app.command(name="format")
 def format_all(json_output: bool = typer.Option(False, "--json")) -> None:
     """归一化 GeoJSON 文本（稳定排序、6 位小数）。"""
-    _todo("format", "格式化", "TASK-0005", json_output)
+    todo("format", "格式化", "TASK-0010", json_output)
 
 
 @app.command()
@@ -233,72 +310,25 @@ def export(
     out: Path = typer.Option(Path("dist"), "--out"),
 ) -> None:
     """导出（静态站点推迟到 M5 之后；QGIS 见 TASK-0010）。"""
-    _todo("export", f"导出（static={static}, qgis={qgis}, out={out}）", "TASK-0010", True)
+    todo("export", f"导出（static={static}, qgis={qgis}, out={out}）", "TASK-0010", True)
 
 
 @app.command()
 def openapi(out: Path = typer.Option(Path("docs/openapi.json"), "--out")) -> None:
     """导出 OpenAPI 契约到文件。"""
-    _todo("openapi", f"导出 OpenAPI（{out}）", "TASK-0006", True)
+    todo("openapi", f"导出 OpenAPI（{out}）", "TASK-0006", True)
 
 
 @app.command()
 def backup(out: Path = typer.Option(Path("backups"), "--out")) -> None:
     """备份：源码 + annotations.sql 打包。"""
-    _todo("backup", f"备份到 {out}", "TASK-0004", True)
-
-
-@db_app.command("dump")
-def db_dump(out: Path = typer.Option(Path("world/annotations.sql"), "--out")) -> None:
-    """把工作库导出为可提交的 SQL dump（只导逻辑表）。"""
-    _todo("db dump", f"导出 dump（{out}）", "TASK-0004", True)
-
-
-@db_app.command("restore")
-def db_restore(infile: Path = typer.Option(Path("world/annotations.sql"), "--in")) -> None:
-    """从 dump 恢复工作库并重建 FTS/RTree。"""
-    _todo("db restore", f"恢复（{infile}）", "TASK-0004", True)
-
-
-@db_app.command("verify-dump")
-def db_verify(infile: Path = typer.Option(Path("world/annotations.sql"), "--in")) -> None:
-    """校验 dump 与工作库一致（含 search_text 一致性）。"""
-    _todo("db verify-dump", f"校验 dump（{infile}）", "TASK-0004", True)
-
-
-@db_app.command("migrate")
-def db_migrate() -> None:
-    """执行待应用的迁移。"""
-    _todo("db migrate", "迁移", "TASK-0004", True)
-
-
-@annotations_app.command("export")
-def ann_export(
-    json_output: bool = typer.Option(False, "--json"),
-    out: Path = typer.Option(Path("build/annotations.export.json"), "--out"),
-) -> None:
-    """导出标注 JSON 快照（只读）。"""
-    _todo("annotations export", f"导出标注（{out}）", "TASK-0004", json_output)
-
-
-@annotations_app.command("import")
-def ann_import(
-    path: Path = typer.Option(..., "--json-file", "--file", help="标注 JSON 文件。"),
-) -> None:
-    """从 JSON 批量导入标注。"""
-    _todo("annotations import", f"导入标注（{path}）", "TASK-0004", True)
-
-
-@annotations_app.command("import-geojson")
-def ann_import_geojson(path: Path = typer.Option(..., "--geojson")) -> None:
-    """从 QGIS 导出的 GeoJSON 导入标注。"""
-    _todo("annotations import --geojson", f"导入 GeoJSON 标注（{path}）", "TASK-0010", True)
+    todo("backup", f"备份到 {out}", "TASK-0004", True)
 
 
 @geometry_app.command("import")
 def geo_import(directory: Path = typer.Option(..., "--dir")) -> None:
     """导入 QGIS 编辑后的几何目录。"""
-    _todo("geometry import", f"导入几何（{directory}）", "TASK-0010", True)
+    todo("geometry import", f"导入几何（{directory}）", "TASK-0010", True)
 
 
 def run() -> None:
@@ -307,7 +337,7 @@ def run() -> None:
         app()
     except MapCreatorError as exc:
         typer.secho(json.dumps(exc.to_dict(), ensure_ascii=False), fg="red", err=True)
-        sys.exit(_exit_code_for(exc))
+        sys.exit(exit_code_for(exc))
 
 
 if __name__ == "__main__":  # pragma: no cover

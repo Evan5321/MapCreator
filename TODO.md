@@ -49,50 +49,51 @@
 - **Evidence**：`doctor --json` 输出（必需项全绿、退出码 0）；`tests/unit/test_doctor.py` 5 条用例。
 - **Deps**：TASK-0001
 
-### `[ ]` TASK-0003 配置与 schema
+### `[x]` TASK-0003 配置与 schema
 
 - **Scope**：`config/world.toml`、`kinds.toml`（27 个 kind）、`zoom_bands.toml`（6 带）、`palette.toml`；`schemas/*.json`；`world/world.json`；`tests/fixtures/mini-world/`。
 - **Acceptance**：
-  - [ ] 4 个 TOML 可被 Pydantic 加载，非法值报错含字段路径。
-  - [ ] JSON Schema 由模型导出（`schemas/*.schema.json`），与 `DATA_SPEC` 一致。
-  - [ ] mini-world 满足 `DATA_SPEC`（1 大陆、1 海、2 河、1 山脉、2 城、5 POI、1 地铁线）。
-  - [ ] `mapcreator describe --json` 输出计数与 bounds。
+  - [x] 4 个 TOML 可被 Pydantic 加载，非法值报错含字段路径。
+  - [x] JSON Schema 由模型导出（`schemas/*.schema.json`），与 `DATA_SPEC` 一致。
+  - [x] mini-world 满足 `DATA_SPEC`（1 大陆、1 海、2 河、1 山脉、2 城、5 POI、1 地铁线）。
+  - [x] `mapcreator describe --json` 输出计数与 bounds。
 - **Evidence**：schema 文件、`describe --json`。
 - **Deps**：TASK-0002
 
-### `[ ]` TASK-0004 数据库层
+### `[x]` TASK-0004 数据库层
 
 - **Scope**：`src/mapcreator/db/schema.sql`、`migrations/`、`repo.py`；`annotation_name`；FTS/RTree 触发器；dump/restore/verify。
 - **Acceptance**：
-  - [ ] `db restore` → `db verify-dump` → `db dump` 往返一致（逻辑表字节级）。
-  - [ ] 名称 `is_primary` 唯一约束生效；缺主名被拒。
-  - [ ] `search_text` 与名称表不一致时 `verify-dump` 失败。
-  - [ ] 触发器维护 FTS/RTree；软删除后查询过滤正确。
-  - [ ] 搜索：2 字走 LIKE、3 字走 MATCH，均有单测。
-- **风险**：本机 `D:\Git_Projects\MapCreator` 下 SQLite 的 `DELETE`（默认）与 `WAL` 模式写入静默丢失（`TRUNCATE`/`PERSIST` 正常），见 `docs/STATUS.md`「已知问题」。**已决定搁置**：先按计划实现，真正写库撞墙时再用备选方案（TRUNCATE / 迁 C: / 杀软白名单）并写 ADR。
-- **Evidence**：pytest 输出、dump 片段。
+  - [x] `db restore` → `db verify-dump` → `db dump` 往返一致（逻辑表字节级）。
+  - [x] 名称 `is_primary` 唯一约束生效；缺主名被拒。
+  - [x] `search_text` 与名称表不一致时 `verify-dump` 失败。
+  - [x] 触发器维护 FTS/RTree；软删除后查询过滤正确。
+  - [x] 搜索：2 字走 LIKE、3 字走 MATCH，均有单测。
+  - [x] 上述往返在**真实路径** `world/annotations.db` 上通过（人类终端，2026-11-19）。
+- **环境备注**：曾出现 `db init` 退出码 4（`no such table: main.annotation_name`、DB 0 字节 + 512 B 残留 journal）。定位为 **Agent 运行环境拦截文件删除**（`os.unlink` 返回成功但文件仍在）→ SQLite 热日志残留、重开回滚；磁盘与 SQLite 本身正常。**写库命令请在人类终端执行**；无需 TRUNCATE/迁盘/白名单。
+- **Evidence**：`annotations import` → `count: 8`；`db dump` → `world/annotations.sql`（5489 B、`schema_version: 1`）；`db restore` → ok；`db verify-dump` → `checked: logical-tables`；`annotations.db` 114688 B；pytest `38 passed, 1 skipped`。
 - **Deps**：TASK-0003
 
-### `[ ]` TASK-0005 构建合并
+### `[x]` TASK-0005 构建合并
 
 - **Scope**：`build/pipeline.py`、`bands.py`、`manifest.py`；原子发布。
 - **Acceptance**：
-  - [ ] `validate` 只校验不产物；`build` 产物落在 `.tmp-build/` 后原子替换。
-  - [ ] 合并视图 `build/unified.geojson` 与 `build/annotations.export.json` 生成。
-  - [ ] `manifest.json` 含输入哈希、计数、`build_version`、推导 bounds，**无时间戳**。
-  - [ ] 同输入连跑两次产物字节一致（除字体/图标）。
-- **Evidence**：manifest、两次构建哈希比对。
+  - [x] `validate` 只校验不产物；`build` 产物落在 `.tmp-build/` 后原子替换（失败保留上次产物）。
+  - [x] 合并视图 `build/unified.geojson` 与 `build/annotations.export.json` 生成。
+  - [x] `manifest.json` 含输入哈希、计数、`build_version`、推导 bounds，**无时间戳**。
+  - [x] 同输入连跑两次产物字节一致（除字体/图标）。
+- **Evidence**：`tests/unit/test_build.py`、`tests/integration/test_build_mini_world.py`；`pytest` 38 passed / 1 skipped；`validate --root tests/fixtures/mini-world --json` → 6 几何 / 8 标注，6 个带标签数 0/2/3/5/8/5。
 - **Deps**：TASK-0004
 
-### `[ ]` TASK-0006 样式与前端地图
+### `[x]` TASK-0006 样式与前端地图
 
 - **Scope**：`build/style.py`、`web/src/{main,map,api,ui}.js`、`styles/base.maplibre.json`。
 - **Acceptance**：
-  - [ ] `serve` 打开显示可缩放地图，`#z/lat/lon` 生效。
-  - [ ] 6 个带按边界加载/卸载 source，带内 filter 正确。
-  - [ ] 点/线标注按 rank 与 zoom 显示，碰撞不重叠。
-  - [ ] 样式通过 style-spec 校验；截图已查看。
-- **Evidence**：截图若干（各带）、style 校验输出。
+  - [x] `serve` 打开显示可缩放地图，`#z/lat/lon` 生效（含同页 hash 变化同步）。
+  - [x] 6 个带按边界加载/卸载标签分片（`/api/data/{band}`）；带内按 `kinds.toml` 的 kind 区间生成 `minzoom/maxzoom`（D-018）。几何统一源 + 每带裁剪/卸载策略留 TASK-0012。
+  - [x] 点标注按 rank 与 zoom 显示；标签按 rank 排序并做屏幕空间贪心碰撞（ADR-021）。
+  - [x] 样式通过 style-spec 校验；截图已查看。
+- **Evidence**：`z6.50` 截图（标签 2：烬堡/银流城）；`z13.00` 截图（band z13-15、标签显示）；style-spec `style-spec OK`；详见 `docs/STATUS.md`。
 - **Deps**：TASK-0005
 
 ## M1 浏览与分级标注

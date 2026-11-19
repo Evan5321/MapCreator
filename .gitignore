@@ -8,6 +8,7 @@ venv/
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
+pytest-of-*/
 .coverage
 coverage.xml
 htmlcov/
@@ -20,6 +21,7 @@ dist/
 
 # ---- 构建与运行产物 ----
 build/
+build.old/
 .tmp-build/
 artifacts/
 logs/

@@ -1,0 +1,24 @@
+{
+  "type": "FeatureCollection",
+  "name": "rivers",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "geo.river.silverrun",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[11.6, 10.2], [12.1, 9.3], [12.8, 8.3], [13.4, 8.05]]
+      },
+      "properties": { "kind": "river", "width_class": 2 }
+    },
+    {
+      "type": "Feature",
+      "id": "geo.river.emberflow",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[14.2, 9.9], [13.7, 9.4], [13.0, 8.9], [12.6, 8.6]]
+      },
+      "properties": { "kind": "river", "width_class": 1 }
+    }
+  ]
+}

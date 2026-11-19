@@ -8,8 +8,9 @@
 
 ## 0. 开工前必读
 
-当前仓库有骨架代码（CLI/config/doctor/tests）与完整文档，尚无业务实现。第一个可执行任务是 `TODO.md` 里的 **TASK-0001（仓库骨架）**。
-在 TASK-0002 完成之前，本文件第 3 节列出的 `mapcreator` 命令中只有 `doctor` 可真正执行，其余仍是占位，不要凭记忆调用。
+当前仓库有骨架代码与部分业务实现：`doctor`、`describe`、`schema`、`db`/`annotations`、`validate`、`build`、`serve` 可用；**TASK-0003 / TASK-0004 / TASK-0005 / TASK-0006 已完成**，下一步 TASK-0007（详情与 URL 状态）。
+**Agent 环境会拦截文件删除**（`os.unlink` 返回成功但文件仍在），导致 SQLite 热日志残留、写库失败；因此 `db`/`annotations` 等**写库命令必须由人类在自己的终端执行**。跑 pytest 前若遇到 `no such table: main.annotation_name`，先删掉仓库根的 `pytest-of-*/` 再用 PowerShell 重跑（残留热日志导致）。
+第 3 节命令表中标注"未实现"的仍是占位，不要凭记忆调用。
 
 ## 1. 阅读顺序
 
@@ -41,10 +42,13 @@
 | 命令 | 用途 | 状态 |
 |---|---|---|
 | `uv run mapcreator doctor --json` | 环境自检 + 修复建议 | 已实现 |
-| `uv run mapcreator describe --json` | 世界概览：范围、kind、计数 | 未实现 |
-| `uv run mapcreator validate --json` | 只校验，不写产物 | 未实现 |
-| `uv run mapcreator build --json` | 全量构建 | 未实现 |
-| `uv run mapcreator serve` | 本地应用（`127.0.0.1:8765`） | 未实现 |
+| `uv run mapcreator describe --json` | 世界概览：范围、kind、计数 | 已实现 |
+| `uv run mapcreator schema --out schemas` | 从模型导出 JSON Schema | 已实现 |
+| `uv run mapcreator db init\|dump\|restore\|verify-dump` | 数据库建库与逻辑 dump 往返 | 已实现（写库须在人类终端） |
+| `uv run mapcreator annotations export\|import` | 标注导入导出 | 已实现（同上） |
+| `uv run mapcreator validate --json` | 只校验，不写产物 | 已实现 |
+| `uv run mapcreator build --json` | 全量构建（`.tmp-build` → 原子替换） | 已实现（`--watch` 未接入） |
+| `uv run mapcreator serve` | 本地应用（`127.0.0.1:8765`；先 `npm run build` 与 `build`） | 已实现 |
 | `uv run mapcreator check --full --json` | 格式/类型/单测/校验/构建/E2E | 未实现 |
 | `uv run mapcreator screenshot --url ... --out ...` | 截图证据 | 未实现 |
 | `uv run mapcreator query --sql ... --json` | 只读 SQL | 未实现 |

@@ -1,0 +1,137 @@
+{
+  "$defs": {
+    "LayerDef": {
+      "additionalProperties": false,
+      "description": "world/world.json 的图层清单条目；file 必须是 world 目录内的相对路径。",
+      "properties": {
+        "file": {
+          "minLength": 1,
+          "title": "File",
+          "type": "string"
+        },
+        "geometry": {
+          "items": {
+            "enum": [
+              "Point",
+              "LineString",
+              "MultiLineString",
+              "Polygon",
+              "MultiPolygon"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Geometry",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9_]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "order": {
+          "title": "Order",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "file",
+        "geometry",
+        "order"
+      ],
+      "title": "LayerDef",
+      "type": "object"
+    },
+    "WorldCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Annotations",
+          "type": "integer"
+        },
+        "features": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Features",
+          "type": "integer"
+        }
+      },
+      "title": "WorldCounts",
+      "type": "object"
+    },
+    "WorldMeta": {
+      "additionalProperties": false,
+      "description": "world/world.json 的 `world` 段。",
+      "properties": {
+        "default_lang": {
+          "title": "Default Lang",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9_]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "default_lang"
+      ],
+      "title": "WorldMeta",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "world/world.json：世界元数据、图层清单、schema 版本。",
+  "properties": {
+    "$schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "$Schema"
+    },
+    "counts": {
+      "$ref": "#/$defs/WorldCounts"
+    },
+    "layers": {
+      "items": {
+        "$ref": "#/$defs/LayerDef"
+      },
+      "minItems": 1,
+      "title": "Layers",
+      "type": "array"
+    },
+    "schema_version": {
+      "minimum": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "world": {
+      "$ref": "#/$defs/WorldMeta"
+    }
+  },
+  "required": [
+    "schema_version",
+    "world",
+    "layers"
+  ],
+  "title": "WorldDocument",
+  "type": "object"
+}

@@ -1,0 +1,17 @@
+{
+  "type": "FeatureCollection",
+  "name": "land",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "geo.continent.aetheria",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[11.0, 7.5], [14.5, 7.5], [14.5, 10.5], [11.0, 10.5], [11.0, 7.5]]
+        ]
+      },
+      "properties": { "kind": "continent", "land_class": "mainland" }
+    }
+  ]
+}

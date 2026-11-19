@@ -1,0 +1,82 @@
+{
+  "$defs": {
+    "KindDef": {
+      "properties": {
+        "attrs_schema": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Attrs Schema"
+        },
+        "color_token": {
+          "title": "Color Token",
+          "type": "string"
+        },
+        "default_max_zoom": {
+          "default": 17.0,
+          "title": "Default Max Zoom",
+          "type": "number"
+        },
+        "default_min_zoom": {
+          "default": 0.0,
+          "title": "Default Min Zoom",
+          "type": "number"
+        },
+        "default_rank": {
+          "default": 3,
+          "maximum": 5,
+          "minimum": 1,
+          "title": "Default Rank",
+          "type": "integer"
+        },
+        "icon": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Icon"
+        },
+        "label_mode": {
+          "default": "point",
+          "enum": [
+            "point",
+            "line",
+            "none"
+          ],
+          "title": "Label Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "color_token"
+      ],
+      "title": "KindDef",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "kinds": {
+      "additionalProperties": {
+        "$ref": "#/$defs/KindDef"
+      },
+      "title": "Kinds",
+      "type": "object"
+    }
+  },
+  "required": [
+    "kinds"
+  ],
+  "title": "KindsConfig",
+  "type": "object"
+}

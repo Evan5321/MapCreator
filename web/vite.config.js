@@ -16,8 +16,9 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     proxy: {
-      // 开发时把 API 转发到本地 FastAPI
+      // 开发时把 API 与构建产物转发到本地 FastAPI
       '/api': 'http://127.0.0.1:8765',
+      '/map': 'http://127.0.0.1:8765',
     },
   },
 });

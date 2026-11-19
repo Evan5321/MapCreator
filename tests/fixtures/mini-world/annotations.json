@@ -1,0 +1,94 @@
+{
+  "annotations": [
+    {
+      "id": "anno.city.silverrun",
+      "kind": "city",
+      "lon": 12.0,
+      "lat": 8.5,
+      "rank": 2,
+      "names": [
+        { "lang": "zh", "name": "银流城", "is_primary": true },
+        { "lang": "en", "name": "Silverrun" }
+      ]
+    },
+    {
+      "id": "anno.city.emberhold",
+      "kind": "city",
+      "lon": 13.6,
+      "lat": 9.2,
+      "rank": 2,
+      "names": [
+        { "lang": "zh", "name": "烬堡", "is_primary": true },
+        { "lang": "en", "name": "Emberhold" }
+      ]
+    },
+    {
+      "id": "anno.hospital.lumen",
+      "kind": "hospital",
+      "lon": 12.05,
+      "lat": 8.52,
+      "rank": 4,
+      "names": [
+        { "lang": "zh", "name": "流明医院", "is_primary": true },
+        { "lang": "en", "name": "Lumen Hospital" }
+      ]
+    },
+    {
+      "id": "anno.school.brook",
+      "kind": "school",
+      "lon": 12.08,
+      "lat": 8.55,
+      "rank": 4,
+      "names": [
+        { "lang": "zh", "name": "溪畔小学", "is_primary": true },
+        { "lang": "en", "name": "Brook School" }
+      ]
+    },
+    {
+      "id": "anno.museum.oldharbor",
+      "kind": "museum",
+      "lon": 12.12,
+      "lat": 8.58,
+      "rank": 5,
+      "names": [
+        { "lang": "zh", "name": "旧港博物馆", "is_primary": true },
+        { "lang": "en", "name": "Old Harbor Museum" }
+      ]
+    },
+    {
+      "id": "anno.temple.dawn",
+      "kind": "temple",
+      "lon": 12.15,
+      "lat": 8.6,
+      "rank": 5,
+      "names": [
+        { "lang": "zh", "name": "晨曦祠", "is_primary": true },
+        { "lang": "en", "name": "Dawn Shrine" }
+      ]
+    },
+    {
+      "id": "anno.market.copper",
+      "kind": "market",
+      "lon": 12.18,
+      "lat": 8.62,
+      "rank": 5,
+      "names": [
+        { "lang": "zh", "name": "铜巷市集", "is_primary": true },
+        { "lang": "en", "name": "Copper Lane Market" }
+      ]
+    },
+    {
+      "id": "anno.metro_line.blue",
+      "kind": "metro_line",
+      "lon": 12.6,
+      "lat": 8.6,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.blue",
+      "names": [
+        { "lang": "zh", "name": "蓝线", "is_primary": true },
+        { "lang": "en", "name": "Blue Line" }
+      ]
+    }
+  ]
+}

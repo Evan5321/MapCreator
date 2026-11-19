@@ -55,3 +55,19 @@ body {
   background: rgb(0 0 0 / 55%);
   border-radius: 4px;
 }
+
+.label-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 2px var(--bg), 0 0 4px var(--bg), 0 0 6px var(--bg);
+}

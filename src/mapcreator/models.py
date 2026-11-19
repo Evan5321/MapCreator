@@ -10,7 +10,7 @@ import re
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 GEO_ID_RE = re.compile(r"^geo\.[a-z_]+(\.[a-z0-9_]+)+$")
 ANNO_ID_RE = re.compile(r"^anno\.[a-z_]+(\.[a-z0-9_]+)+$")
@@ -119,3 +119,61 @@ class GeometryFeature(BaseModel):
     @property
     def geometry_type(self) -> str:
         return str(self.geometry.get("type", ""))
+
+
+class WorldMeta(BaseModel):
+    """world/world.json 的 `world` 段。"""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(min_length=1, pattern=r"^[a-z0-9_]+$")
+    name: str = Field(min_length=1)
+    default_lang: str
+
+
+class LayerDef(BaseModel):
+    """world/world.json 的图层清单条目；file 必须是 world 目录内的相对路径。"""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(min_length=1, pattern=r"^[a-z0-9_]+$")
+    file: str = Field(min_length=1)
+    geometry: list[GeometryType] = Field(min_length=1)
+    order: int
+
+    @field_validator("file")
+    @classmethod
+    def _relative_file(cls, value: str) -> str:
+        normalized = value.replace("\\", "/")
+        if normalized.startswith("/") or ".." in normalized.split("/"):
+            raise ValueError("file 必须是 world 目录内的相对路径（不得使用绝对路径或 ..）")
+        return normalized
+
+
+class WorldCounts(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    features: int = Field(default=0, ge=0)
+    annotations: int = Field(default=0, ge=0)
+
+
+class WorldDocument(BaseModel):
+    """world/world.json：世界元数据、图层清单、schema 版本。"""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    schema_uri: str | None = Field(default=None, alias="$schema")
+    schema_version: int = Field(ge=1)
+    world: WorldMeta
+    layers: list[LayerDef] = Field(min_length=1)
+    counts: WorldCounts = Field(default_factory=WorldCounts)
+
+    @model_validator(mode="after")
+    def _unique_layers(self) -> WorldDocument:
+        ids = [layer.id for layer in self.layers]
+        if len(ids) != len(set(ids)):
+            raise ValueError(f"layer.id 必须唯一：{ids}")
+        files = [layer.file for layer in self.layers]
+        if len(files) != len(set(files)):
+            raise ValueError(f"layer.file 必须唯一：{files}")
+        return self

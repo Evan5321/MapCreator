@@ -107,3 +107,11 @@
 - Decision: UI 文案集中在 `web/i18n/zh.json` 并用 key 引用，不引 i18n 库；名称的多语言由 D-016 承担。
 - Consequences: 正向——零依赖、可直接改文案；负向——将来加界面语言要手工加 key 文件（成本低）。
 - Alternatives: 引 i18n 框架（为一个人维护两套文案不值）；硬编码中文（阻碍后续）。
+
+### ADR-021: M0 标签用 DOM 层 + 屏幕空间碰撞
+
+- Status: accepted（2026-11-19）
+- Context: `ARCHITECTURE.md` §7 计划全部标注走 symbol layer；但仓库没有字体 glyph 与 icon sprite，且本轮不允许联网下载或新增依赖，symbol layer 的 `text-field` 无法渲染。
+- Decision: TASK-0006 用 [web/src/labels.js](../web/src/labels.js)：按带拉取 `/api/data/{band}`，投影到屏幕坐标后做贪心碰撞剔除，标签为绝对定位 DOM；标注点仍由 style 的 circle 层渲染（每 kind 一层，`minzoom/maxzoom` 来自 `kinds.toml`）。
+- Consequences: 正向——零字体资源即可看到分级标签与碰撞；负向——标签量大时 DOM 性能与渐隐/anchor 能力弱于 symbol layer，TASK-0011/0012 需在字体方案确定后评估切回。
+- Alternatives: 自托管字体 glyph（需要下载/安装资源，规则禁止未批准的联网与安装）；用圆点代替文字（丢失名称信息）。
