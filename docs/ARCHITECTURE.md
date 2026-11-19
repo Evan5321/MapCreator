@@ -62,14 +62,24 @@
 | `server/static.py` | 静态资源、SPA 回退、缓存头 | 构建 |
 | `qgis/roundtrip.py` | 导出/导入 GeoJSON 往返 | 拓扑检查 |
 | `web/src/map.js` | MapLibre 实例、source/layer、缩放带切换 | 业务数据 |
-| `web/src/editor.js` | Terra Draw 模式、撤销、保存提交 | 持久化 |
+| `web/src/shell.js` | 浏览/编辑共用外壳、左栏与顶栏、模式切换 | 绘制逻辑 |
+| `web/src/panels.js` | 面板零件（分节、行、开关、滑杆、属性卡） | 数据请求 |
+| `web/src/layers.js` | 图层分组、开关、图例 | 样式生成 |
+| `web/src/pick.js` | 点选容差、最近命中、顶点手柄 | 渲染 |
+| `web/src/shortcuts.js` | 快捷键表与匹配 | 业务动作 |
+| `web/src/history.js` | 会话内撤销/重做快照栈 | 持久化 |
+| `web/src/editor.js` | Terra Draw 工具模式、绘制/拖拽、保存提交 | 持久化 |
 | `web/src/api.js` | 请求封装、错误归一化 | 校验唯一防线 |
+
+浏览模式只挂载 `map/shell/panels/layers`，编辑工具（`editor/pick/history` 的 UI 部分）仅在编辑模式加载。
 
 ## 4. 三条数据流
 
 **浏览**：`world/` → `build` → `build/data/labels.<band>.geojson` 等 → FastAPI 静态提供 → MapLibre 渲染。
 
 **编辑**：浏览器/QGIS → 统一写入口（FastAPI `--enable-edit` 或 CLI）→ Pydantic + Shapely + 引用检查 + `revision` 检查 → 写 GeoJSON / SQLite 事务 → 增量构建 → 页面刷新。
+
+**编辑（TASK-0009 临时库）**：浏览器编辑器 → dev-only 写端点（`serve --editable`）→ 同样的校验链 → `var/editor-test/annotations.db` + `var/editor-test/geometry/` → 用临时库预览构建。该路径永不打开 `world/annotations.db`。
 
 **AI 查询**：`mapcreator describe/query/export --json` → 结构化 JSON；AI 永不直接解析二进制 DB。
 
@@ -106,13 +116,14 @@
 
 约定：写接口必须带 `revision`（409 `REVISION_CONFLICT`）；除搜索/详情外**载荷只给 ID 与渲染必需字段**；错误体统一 `code/message/path/feature_id/details/remediation`；编辑端点未开启时返回 404。
 
+开发模式（TASK-0009）：`serve --editable --editor-db var/editor-test/annotations.db` 时，`/api/annotations` 的写方法与详情读取指向临时库，几何写 `var/editor-test/geometry/`；路径解析后校验不得等于 `world/annotations.db`。普通 `serve` 不注册写端点。
+
 ## 7. 渲染与分带
 
 - 6 个固定带（`z0-3 … z16-17`），带边界**只**由 `config/zoom_bands.toml` 定义。
-- 前端跨带时加载/卸载 source，预加载相邻带；带内由 style filter 精确判定可见性。
-- 全部标注走 symbol layer；禁止 DOM marker 渲染上万点。
-- 碰撞由 `symbol-sort-key = rank`、图层顺序、`text-allow-overlap:false` 共同决定。
-- 每带可见标注 ≤ 3000，超出裁剪低 rank。
+- 标签分片按带加载/卸载（`/api/data/{band}`）；几何当前合并为 `unified.geojson`，按带裁剪见 TASK-0012。
+- 标签当前为 DOM 层 + 屏幕空间贪心碰撞（ADR-021）；可见点超过约 1 万时切 symbol layer + 自托管 glyph。
+- 碰撞由 `rank` 排序与先到先得决定；每带可见标注 ≤ 3000，超出裁剪低 rank。
 
 ## 8. 存储布局
 
@@ -125,6 +136,7 @@
 | `build/` | 产物（含 `manifest.json`） | 否 |
 | `artifacts/` | 截图与性能报告 | 否 |
 | `logs/app.jsonl` | 运行日志 | 否 |
+| `var/editor-test/` | 编辑器临时库与几何（TASK-0009） | 否 |
 
 ## 9. 复用优先（"不要重复造轮子"）
 
@@ -150,6 +162,7 @@
 - SQL 接口只允许 `SELECT`/`WITH`，只读连接、超时、行数上限。
 - 文件写入 `临时文件 + os.replace`；构建用目录原子替换。
 - 数据目录与代码目录分离，服务不以写权限访问 `src/`。
+- `--editor-db` 解析为绝对路径后必须拒绝 `world/annotations.db` 与 `world/geometry/`；临时库只允许落在 `var/`。
 
 ## 11. 失败模式（必须显式处理）
 

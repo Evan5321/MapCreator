@@ -8,8 +8,16 @@
 | 方案 | 用途 | 决策 |
 |---|---|---|
 | Web 编辑器（Terra Draw） | 日常点/线/面 + 标注编辑 | MVP 必做 |
+| 浏览与编辑共用外壳 | 一套 UI，两种模式 | 浏览模式只渲染地图与只读面板，不挂载工具组件 |
 | QGIS | 批量绘制、拓扑检查、海岸线/边界精修 | 可选，不装也能完成 MVP |
 | 自研桌面编辑器 | 产品化 | 暂不做；需要时先 ADR |
+
+界面约束：
+
+- **只做桌面端**（基准 1280×720）；不做移动端与触屏手势。
+- 视觉为**现代电子地图**（扁平矢量、弱纹理、清晰层级），不使用手绘/羊皮纸风格。
+- 左栏顺序固定：图层 → 标注列表 → 世界信息；右侧为详情面板。
+- 浏览模式不出现工具栏、绘制手柄、保存按钮；切换到编辑模式才挂载。
 
 ## 2. 工具与数据的映射
 
@@ -25,14 +33,24 @@
 ## 3. Web 编辑器功能
 
 - 工具：选择、点、线、多边形、矩形、自由绘制；顶点拖拽、增删顶点。
-- 撤销/重做：用 Terra Draw 自带能力；**先核对锁定版本的 API**，不凭记忆写。
-- 属性表单：基础字段（多语言名称、rank、min/max zoom、描述）专门渲染；业务属性用 `@json-editor/json-editor` 按 `attrs_schema` 生成。
+- 交互：拖动 > 4px 才算拖拽；点选框最小 14px；距已有顶点/线 ≤ 8px 吸附；`Esc` 取消、双击结束线/面。
+- 撤销/重做：会话内快照栈（上限 100）；用 Terra Draw 自带能力时**先核对锁定版本 API**，不凭记忆写。
+- 属性表单**一次做全**：`kind`、主名/多语言名、`rank`、`min_zoom/max_zoom`（留空=继承）、`description`、`attrs`（按 `attrs_schema` 用 `@json-editor/json-editor` 渲染）。
 - 名称编辑：至少一个主名（`is_primary`）；可加任意语种与别名；不能删到零个。
 - 保存：一次提交一个或多个要素 → 服务端逐条校验 → 返回逐要素错误（部分成功要明确列出）。
 - 软删除 + 恢复；删除需二次确认。
 - 锚点拖动：线/面标注的 `lon/lat` 可拖动优化位置，不影响几何。
 
 ## 4. 保存协议
+
+开发阶段（TASK-0009）先写**临时测试库**，不碰 `world/`：
+
+- 启动：`uv run mapcreator serve --editable --editor-db var/editor-test/annotations.db`；未加 `--editable` 时不挂写端点。
+- 临时库**跨重启保留**，不清空；首次启动若库为空，从当前 `build/annotations.export.json` 播种。
+- 线/面几何写 `var/editor-test/geometry/*.geojson`，与临时库同生命周期；不写 `world/geometry/`。
+- 服务端解析路径后必须校验其不等于 `world/annotations.db`；`var/` 不提交（见 `.gitignore`）。
+- 普通 `serve` 仍只读 `world/annotations.db`；两库切换由启动参数决定，界面显示当前所处模式。
+- 正式库写入（TASK-0009）沿用同一协议，只切换目标库。
 
 ```text
 PATCH /api/annotations/anno.city.silverrun
@@ -80,7 +98,18 @@ PATCH /api/annotations/anno.city.silverrun
 - 强拓扑（共享边、连通性）用 QGIS Topology Checker；构建期只做基础有效性。
 - 往返必须保字段：导出→导入不得丢失 `attrs`、`names`、`rank`、`min/max_zoom`（用 golden 测试守）。
 
-## 9. 验收（M3）
+## 9. 验收
+
+TASK-0009（临时测试库 → 正式库）：
+
+- [ ] 浏览/编辑共用一套外壳；浏览模式无工具栏/绘制手柄；桌面 1280/1440/1920 无溢出。
+- [ ] 创建/编辑/删除点、线、面；拖拽锚点、顶点编辑、吸附生效。
+- [ ] 属性卡含 kind、主名/多语言名、rank、min/max zoom、description、attrs；非法输入被拒绝并就地显示。
+- [ ] 撤销/重做覆盖绘制、拖拽与属性修改。
+- [ ] 保存到 `var/editor-test/annotations.db`，重启 `serve --editable` 后仍在；`world/annotations.db` 修改时间不变。
+- [ ] 导出 JSON 可被 `mapcreator annotations import` 接受。
+
+正式库追加验收：
 
 - [ ] 创建/编辑/删除 点、线、面三类，各至少一条 E2E。
 - [ ] 属性表单由 schema 生成；非法输入被拒绝并显示原因。

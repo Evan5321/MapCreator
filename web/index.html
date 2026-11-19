@@ -9,11 +9,39 @@
   <body>
     <div id="app">
       <div id="map"></div>
-      <aside id="sidebar" hidden>
+
+      <header id="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div class="brand-text">
+            <strong id="topbar-title">MapCreator</strong>
+            <span id="topbar-subtitle">浏览模式 · 只读</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="btn-reset-view" class="ghost-button" type="button">重置视图</button>
+          <button
+            id="btn-toggle-left"
+            class="ghost-button"
+            type="button"
+            aria-expanded="true"
+            aria-controls="leftbar"
+          >
+            收起左栏
+          </button>
+        </div>
+      </header>
+
+      <aside id="leftbar" aria-label="图层、标注列表与世界信息">
+        <div id="leftbar-body"></div>
+      </aside>
+
+      <aside id="sidebar" aria-label="标注详情" hidden>
         <button id="detail-close" type="button" aria-label="关闭详情">×</button>
         <h2 id="detail-title">—</h2>
         <div id="detail-body"></div>
       </aside>
+
       <div id="statusbar" role="status"></div>
     </div>
     <script type="module" src="/src/main.js"></script>

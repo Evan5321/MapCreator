@@ -1,6 +1,6 @@
 # 项目状态（STATUS）
 
-- **当前里程碑**：M1（浏览与分级标注）——**TASK-0003 ~ TASK-0007 完成**，`serve` 可浏览分级地图并点选查看详情
+- **当前里程碑**：M1 完成（TASK-0003 ~ TASK-0007），M3 的浏览外壳 TASK-0013 已完成；下一步 TASK-0008 搜索，编辑器按原顺序留在 TASK-0009
 - **最近更新**：2026-11-19
 - **维护规则**：每完成一个任务更新本文件；只写事实与证据，不写计划口号（计划在 `TODO.md`）。
 
@@ -65,12 +65,20 @@
   - [server/app.py](../src/mapcreator/server/app.py)：`create_app(db_path=...)`，默认 `world/annotations.db`。
   - 前端：[ui.js](../web/src/ui.js) 详情面板（全部语种叠加、当前语种高亮、坐标/有效缩放/rank/几何/revision/attrs）；[map.js](../web/src/map.js) 点击查询与 `pointLayers`；[labels.js](../web/src/labels.js) 标签可点击、DOM 选中圆环（WebGL circle filter 在实测中未显示，改用 DOM 环，见 ADR-022）；[main.js](../web/src/main.js) `#z/lat/lon?sel=&lang=` 完整读写与 hashchange 同步、`window.__app.selectedId`。
   - 测试：[test_server.py](../tests/integration/test_server.py) 覆盖详情 200（kind 默认 zoom）、404、503；详情库在 tmp 中通过 `repo.init_schema` + `upsert_annotation` 构造。
+- **TASK-0013 UI 外壳（浏览，2026-11-19，纯前端）**：
+  - 新增 [shell.js](../web/src/shell.js)（顶栏/左栏/状态栏装配，左栏顺序 图层 → 标注列表 → 世界信息）、[panels.js](../web/src/panels.js)（可折叠分节、开关行、列表行、统计表、空态）、[layers.js](../web/src/layers.js)（把 `build/style.json` 的图层 ID 映射成底图/线状/点标注三组开关）、[shortcuts.js](../web/src/shortcuts.js)（按 `event.code` 绑定，输入控件内不拦截）。
+  - 点标注开关联动 [labels.js](../web/src/labels.js) 的 `hiddenKinds`：`setLayoutProperty('visibility')` 关 WebGL 点层的同时剔除 DOM 标签，两者不会不一致；`list()` 暴露当前带标注摘要供左栏列表使用。
+  - [index.html](../web/index.html) 重排为地图全幅 + `#topbar` + `#leftbar`（`#sidebar` 保留为右侧详情）；[style.css](../web/src/style.css) 改为深色现代电子地图配色（分节、开关、列表、状态栏），桌面端 ≥1280×720，右侧详情与状态栏无遮挡。
+  - [main.js](../web/src/main.js) 装配外壳：选中同步（地图点选/标签点击/列表行三者共用 `select()`）、`Escape` 清选中、带切换时刷新列表、状态栏改由 `shell.setStatus` 输出；`ui.js` 移除 `setStatus`，只保留详情面板。
+  - **修复启动崩溃**：生产构建下若 `initMap` 显式传 `zoom: undefined`，MapLibre 的 `jumpTo` 以 `'zoom' in options` 判断，会把它算成 `NaN` 并在 `_calcMatrices` 抛 `failed to invert matrix`，整页白屏。[map.js](../web/src/map.js) 改为「无 center 时不传 zoom」。
+  - 浏览模式不挂载任何编辑组件；工具栏/绘制/属性卡仍属 [TASK-0009](TODO.md)。
 
 ## 未完成 / 阻塞
 
 | 状态 | 项 | 影响 |
 |---|---|---|
 | 未做 | `#sel=` 的 Playwright E2E 断言（`window.__app.selectedId` 已就绪） | 目前靠手工浏览器验证，属 TASK-0011 |
+| 未复测 | 浏览外壳的 `Ctrl+\` 收起、单个 kind 开关、`重置视图` 按钮、跨带列表刷新 | 均为纯前端行为，代码已就位；需要在真实浏览器手工点一遍 |
 | 未做 | `check --full` / `screenshot` / `query` / `openapi` / `format` 仍为占位 | 返回 `NOT_IMPLEMENTED`（退出码 4），属 TASK-0008/0010/0011 |
 | 未做 | 每带几何裁剪与 source 卸载（当前几何为单一 `unified.geojson`） | 大数据量时的载荷/内存优化，属 TASK-0012 |
 | 未做 | 真实世界内容（`world/` 几何为空） | 真实 `build` 仅含 8 条标注点，暂无几何要素 |
@@ -89,13 +97,19 @@
 
 ## 下一步
 
-1. **TASK-0008**：搜索与只读 SQL（`/api/search`、`/api/query`）。
-2. **TASK-0011**：Playwright E2E（`window.__app.selectedId` 断言、启动验证）。
-3. 人工项（可并行）：Chromium 启动验证、`ENVIRONMENT.md` 许可证核对、首次提交与 `git push -u origin main`。
+1. **TASK-0008**：搜索与只读 SQL（`/api/search`、`/api/query`），并给浏览外壳加搜索框。
+2. **TASK-0009**：编辑器交互 + 临时测试库 `var/editor-test/`（持久化、写端点仅 dev、完整属性卡），随后升级正式库。
+3. **TASK-0011**：Playwright E2E（`window.__app.selectedId` 断言、启动验证）。
+4. **TASK-0012**：每带几何裁剪与 source 卸载。
 
 ## 最近证据
 
 - TASK-0007 门禁：`ruff format --check .` / `ruff check .` / `mypy src` 全绿；`uv run pytest -q` → `46 passed, 1 skipped`（跳过项为 TASK-0011 E2E；唯一 warning 来自 FastAPI TestClient 的第三方弃用提示）；`npm run check` 通过；`npm run build` 产出新 bundle。
+- TASK-0013 门禁（前端）：`npm run check` → `Checked 18 files in 245ms. No fixes applied.`；`npm run build` → `dist/assets/index-Dqz9IUYj.js` 820.73 kB（Vite 提示 >500 kB，非错误）。后端未改，Python 门禁沿用 TASK-0007 结果。
+- TASK-0013 浏览器（Playwright，1280×720，`http://127.0.0.1:8765/`）：`window.__app.ready=true`；左栏分节顺序 `['图层','标注列表','世界信息']`；左栏底部 664px < 视口 720px（无溢出）；状态栏 `z4-6 · z6.93 · Aetheria · 标签 2`。
+- TASK-0013 交互：点列表行「烬堡」→ `selectedId=anno.city.emberhold`、`location.hash=#6.93/9.00581/12.25000?sel=anno.city.emberhold`、右侧详情标题「烬堡」（ZH 烬堡 / EN Emberhold、ID、坐标 13.600000 9.200000、显示缩放 z4–z13、rank 2、点标注无几何、修订 2）；关闭「全部点标注」→ `labels 0 / labelNodes 0`（WebGL 点层与 DOM 标签同步隐藏）；带 `?sel=` 刷新 → 选中与详情面板自动恢复。
+- TASK-0013 截图（`var/` 已忽略，不提交）：`var/tmp/1-initial.png`（初始三栏 + 两个标签）、`var/tmp/2-selected.png`（右侧详情）、`var/tmp/3-points-off.png`（点标注关闭）、`var/tmp/4-collapsed.png`（左栏收起）；截图已逐张人工查看。
+- TASK-0013 遗留：`Ctrl+\` 收起、单 kind 开关、`重置视图`、跨带列表刷新未单独复测（代码已就位，见「未完成 / 阻塞」）。
 - TASK-0007 API：`/api/annotations/anno.city.silverrun` → 200（双语名称、`min_zoom 4 / max_zoom 13`）；`/api/annotations/anno.school.brook` → 200（`12/17`）；缺失 ID → 404 `ANNOTATION_NOT_FOUND`；`db_path` 不存在 → 503 `DB_MISSING`。
 - TASK-0007 浏览器：`http://127.0.0.1:8765/?v=9#13.00/8.55/12.08?sel=anno.school.brook&lang=en` → 侧栏标题 "Brook School"、ZH 溪畔小学 主名 / EN Brook School、显示缩放 z12–z17、点选圆环可见、状态栏 `z13-15 · z13.00 · Aetheria · 标签 1 · 选中 anno.school.brook`，地址栏保留 `sel`；截图 `c:\Users\liyunlin\AppData\Local\Temp\trae\screenshots\brook_school_selected.jpg`。
 - TASK-0006 门禁：`ruff format --check .` / `ruff check .` / `mypy src` 全绿；`uv run pytest -q` → `44 passed, 1 skipped`；`npm run check` → `Checked 14 files`；`npm run build` → `web/dist`（index + assets）。

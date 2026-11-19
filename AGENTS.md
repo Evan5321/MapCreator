@@ -8,7 +8,7 @@
 
 ## 0. 开工前必读
 
-当前仓库有骨架代码与部分业务实现：`doctor`、`describe`、`schema`、`db`/`annotations`、`validate`、`build`、`serve` 可用；**TASK-0003 / TASK-0004 / TASK-0005 / TASK-0006 / TASK-0007 已完成**，下一步 TASK-0008（搜索与只读 SQL）。
+当前仓库有骨架代码与部分业务实现：`doctor`、`describe`、`schema`、`db`/`annotations`、`validate`、`build`、`serve` 可用；**TASK-0003 ~ TASK-0007 已完成**，下一步 TASK-0013（浏览外壳）；编辑器按原顺序留在 TASK-0009（含临时库 `var/editor-test/`），方案见 `docs/CIV_ATLAS_UI_PORT.md`。
 **Agent 环境会拦截文件删除**（`os.unlink` 返回成功但文件仍在），导致 SQLite 热日志残留、写库失败；因此 `db`/`annotations` 等**写库命令必须由人类在自己的终端执行**。跑 pytest 前若遇到 `no such table: main.annotation_name`，先删掉仓库根的 `pytest-of-*/` 再用 PowerShell 重跑（残留热日志导致）。
 第 3 节命令表中标注"未实现"的仍是占位，不要凭记忆调用。
 

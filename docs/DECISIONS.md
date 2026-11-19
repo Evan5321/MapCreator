@@ -123,3 +123,11 @@
 - Decision: 选中高亮改为 [web/src/labels.js](../web/src/labels.js) 中的 `.selection-ring` DOM 元素，位置由 `map.project` 计算并在标签重排时更新；标签层始终在其上方，圆点仍由样式 circle 层渲染。
 - Consequences: 正向——高亮稳定可见、与 DOM 标签共用坐标系、无额外 layer/filter 状态；负向——环不随地图画布导出（截图/静态导出需另行处理），且只覆盖当前带内可见标签。
 - Alternatives: 继续排查 `['id']` 过滤（时间成本高、收益仅为少一个 DOM 节点）；用 feature-state（需要 `promoteId` 并改构建产物）；把 `id` 写进 properties（破坏 ID 单一表达）。
+
+### ADR-023: 浏览/编辑共用外壳，编辑先写临时测试库
+
+- Status: accepted（2026-11-19）
+- Context: 参考 civ-atlas 重做界面时，需要同时满足“浏览时不出现编辑控件”和“编辑器数据不污染 `world/` 真源”；同时要遵守单一写路径（AGENTS §2.1）。
+- Decision: 前端一套外壳两种模式——浏览模式只挂地图与只读面板，编辑模式才挂载 `editor/pick/history` 的工具 UI；编辑写入走 dev-only 端点，目标固定为 `var/editor-test/annotations.db`（跨重启保留、首次从构建播种），几何写 `var/editor-test/geometry/`，服务端拒绝解析到 `world/` 的任何路径。正式库写入留给 TASK-0009。
+- Consequences: 正向——可安全试用编辑器，`world/annotations.db` 不被触碰；负向——需要临时库与正式库两套读取路径，界面必须明确显示当前模式。
+- Alternatives: 只导出文件不落库（无法验证重启持久化）；直接写 `world/`（违反用户要求与真源保护）。

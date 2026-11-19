@@ -8,7 +8,9 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { getAnnotation } from './api.js';
 import { bandForZoom, initMap } from './map.js';
-import { hideDetail, renderDetail, renderDetailError, setStatus } from './ui.js';
+import { createShell } from './shell.js';
+import { bindShortcuts } from './shortcuts.js';
+import { hideDetail, renderDetail, renderDetailError } from './ui.js';
 
 /** 测试模式暴露的只读探针（E2E 断言用，见 docs/TESTING.md §4）。 */
 const app = {
@@ -71,12 +73,22 @@ async function bootstrap() {
     );
     const layers = pointLayers.filter((layer) => map.getLayer(layer) !== undefined);
 
+    const shell = createShell({
+      world,
+      map,
+      onSelect: (id) => select(id),
+      onKindVisibility: (kind, visible) => labels.setKindVisible(kind, visible),
+    });
+
     app.band = bandForZoom(map.getZoom(), world.bands);
     await labels.setBand(app.band);
+    shell.setBand(app.band);
+    shell.setAnnotations(labels.list());
 
     /** @param {string} id */
     async function select(id) {
       app.selectedId = id;
+      shell.setSelected(id);
       try {
         const detail = await getAnnotation(id);
         renderDetail(detail, { lang: app.lang });
@@ -90,6 +102,7 @@ async function bootstrap() {
 
     function clearSelection() {
       app.selectedId = null;
+      shell.setSelected(null);
       hideDetail();
       labels.refresh();
       updateStatus();
@@ -102,7 +115,7 @@ async function bootstrap() {
       app.center = { lon: center.lng, lat: center.lat };
       app.visibleLabelCount = labels.visible();
       const selection = app.selectedId ? ` · 选中 ${app.selectedId}` : '';
-      setStatus(
+      shell.setStatus(
         `${app.band} · z${app.zoom.toFixed(2)} · ${world.world.name} · 标签 ${app.visibleLabelCount}${selection}`,
       );
     };
@@ -120,7 +133,11 @@ async function bootstrap() {
       const band = bandForZoom(map.getZoom(), world.bands);
       if (band !== app.band) {
         app.band = band;
-        labels.setBand(band).then(sync);
+        labels.setBand(band).then(() => {
+          shell.setBand(band);
+          shell.setAnnotations(labels.list());
+          sync();
+        });
       } else {
         labels.refresh();
         sync();
@@ -145,6 +162,12 @@ async function bootstrap() {
 
     const closeButton = document.getElementById('detail-close');
     closeButton?.addEventListener('click', clearSelection);
+
+    bindShortcuts({
+      Escape: () => {
+        if (app.selectedId) clearSelection();
+      },
+    });
 
     app.ready = true;
     sync();
@@ -172,7 +195,8 @@ async function bootstrap() {
       }
     });
   } catch (error) {
-    setStatus(`启动失败：${String(error)}`);
+    const status = document.getElementById('statusbar');
+    if (status) status.textContent = `启动失败：${String(error)}`;
     throw error;
   }
 }
