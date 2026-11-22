@@ -27,7 +27,10 @@
 
 | 包 | 版本 | 用途 | 许可证 | 引入任务 |
 |---|---|---|---|---|
-| _（暂无）_ | | | | |
+| maplibre-gl | 4.7.x（`^4.7.1`，lockfile 兜底） | 地图渲染 | BSD-3-Clause（初判） | TASK-0006（已装） |
+| terra-draw | 1.40.0（`^1.0.0`，lockfile 实装 1.40.0） | 绘制引擎 | MIT（初判） | TASK-0009（已装，尚未接入） |
+| @json-editor/json-editor | 2.15.x | 表单渲染（阶段 A 改为手写左栏属性表单，本包暂未使用，保留待评估） | MIT（初判） | TASK-0001（已装） |
+| terra-draw-maplibre-gl | 待定（需与 terra-draw 1.40 对齐） | Terra Draw 官方 MapLibre 适配器 | MIT（初判，安装前核对） | TASK-0009 阶段 A（**已获批准，未安装**；由人类终端执行安装，安装后补精确版本与冒烟测试） |
 
 ## 4. 外部可选工具
 

@@ -81,6 +81,8 @@
 
 **编辑（TASK-0009 临时库）**：浏览器编辑器 → dev-only 写端点（`serve --editable`）→ 同样的校验链 → `var/editor-test/annotations.db` + `var/editor-test/geometry/` → 用临时库预览构建。该路径永不打开 `world/annotations.db`。
 
+**编辑（TASK-0009 阶段 A，当前 UI 分支）**：编辑器只在前端内存里维护草稿，另提供“导出 `annotations.json` + `geometry.geojson`”；不连写端点、不碰任何 DB。落库从阶段 B 起才接入上面那条路径。
+
 **AI 查询**：`mapcreator describe/query/export --json` → 结构化 JSON；AI 永不直接解析二进制 DB。
 
 ## 5. 构建管线（11 步）

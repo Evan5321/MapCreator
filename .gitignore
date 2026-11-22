@@ -32,6 +32,12 @@ world/annotations.db
 world/annotations.db-wal
 world/annotations.db-shm
 
+# ---- 演示世界：只提交真源与逻辑 dump，工作库与导出快照不提交 ----
+worlds/*/annotations.db
+worlds/*/annotations.db-wal
+worlds/*/annotations.db-shm
+worlds/*/annotations.export.json
+
 # ---- 编辑器临时测试库（TASK-0014，不提交）----
 var/
 

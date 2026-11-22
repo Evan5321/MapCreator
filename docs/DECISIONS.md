@@ -131,3 +131,15 @@
 - Decision: 前端一套外壳两种模式——浏览模式只挂地图与只读面板，编辑模式才挂载 `editor/pick/history` 的工具 UI；编辑写入走 dev-only 端点，目标固定为 `var/editor-test/annotations.db`（跨重启保留、首次从构建播种），几何写 `var/editor-test/geometry/`，服务端拒绝解析到 `world/` 的任何路径。正式库写入留给 TASK-0009。
 - Consequences: 正向——可安全试用编辑器，`world/annotations.db` 不被触碰；负向——需要临时库与正式库两套读取路径，界面必须明确显示当前模式。
 - Alternatives: 只导出文件不落库（无法验证重启持久化）；直接写 `world/`（违反用户要求与真源保护）。
+
+### ADR-024: 编辑界面阶段只做 UI（前端草稿 + 导出），属性编辑放左栏
+
+- Status: accepted（2026-11-19）
+- Context: 分支 `feat/civ-atlas-ui` 的目标是把界面做出来，而不是打通写库链路；同时用户要求节点属性从右侧详情面板移到左栏，避免“看详情在右、改属性在右”与左栏工具分离。Terra Draw 1.40 需要 MapLibre 适配器，仓库未装。
+- Decision:
+  1. 该分支**只做浏览界面 + 编辑界面**，不做 TASK-0008 搜索/只读 SQL，不做后端写端点。
+  2. 编辑草稿只存浏览器内存，通过“导出 `annotations.json` + `geometry.geojson`”交付；落库（`var/editor-test/` → `world/`）留给后续分支的 TASK-0009 阶段 B/C。
+  3. 属性编辑作为**左栏“属性”分节**（工具栏下方），右侧 `#sidebar` 在编辑态退回只读详情；左栏编辑态顺序 工具 → 属性 → 图层 → 标注列表 → 世界信息。
+  4. 绘制使用 Terra Draw + 官方适配器 `terra-draw-maplibre-gl`（已获批准，待安装），不自研适配层。
+- Consequences: 正向——UI 可独立验收、`world/` 与后端零风险、属性与工具在同一视觉区域；负向——刷新即丢草稿，真实持久化与并发/冲突校验要等阶段 B/C，界面须明确标注“未保存”状态。
+- Alternatives: 本分支同时也接临时库写端点（跨前后端，违背“只做 UI”）；属性继续留在右侧面板（用户已明确要求移动）；自研 MapLibre 适配层（需额外 ADR，维护成本高）。

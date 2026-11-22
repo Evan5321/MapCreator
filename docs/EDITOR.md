@@ -16,8 +16,17 @@
 
 - **只做桌面端**（基准 1280×720）；不做移动端与触屏手势。
 - 视觉为**现代电子地图**（扁平矢量、弱纹理、清晰层级），不使用手绘/羊皮纸风格。
-- 左栏顺序固定：图层 → 标注列表 → 世界信息；右侧为详情面板。
+- 左栏顺序：浏览态 图层 → 标注列表 → 世界信息；**编辑态 工具 → 属性 → 图层 → 标注列表 → 世界信息**（属性编辑在左栏，不用右侧面板）。
 - 浏览模式不出现工具栏、绘制手柄、保存按钮；切换到编辑模式才挂载。
+- **分阶段**：本分支（`feat/civ-atlas-ui`）只做编辑界面，草稿仅存浏览器内存并支持导出 JSON；写库端点与临时库属后续阶段。
+
+阶段划分（与 `TODO.md` 的 TASK-0009 对应）：
+
+| 阶段 | 内容 | 存储 |
+|---|---|---|
+| A（本分支） | 工具、绘制、选择/拖拽/顶点、撤销/重做、左栏属性编辑 | 浏览器内存 + 导出 `annotations.json` / `geometry.geojson` |
+| B（后续） | dev-only 写端点、`serve --editable` | `var/editor-test/annotations.db` + `var/editor-test/geometry/` |
+| C（后续） | 正式库写入、冲突处理 | `world/annotations.db` |
 
 ## 2. 工具与数据的映射
 
@@ -34,16 +43,21 @@
 
 - 工具：选择、点、线、多边形、矩形、自由绘制；顶点拖拽、增删顶点。
 - 交互：拖动 > 4px 才算拖拽；点选框最小 14px；距已有顶点/线 ≤ 8px 吸附；`Esc` 取消、双击结束线/面。
+- 绘制引擎：Terra Draw + **官方 MapLibre 适配器** `terra-draw-maplibre-gl`（已批准，待安装；版本与 `terra-draw@1.40` 对齐），不自研适配层。
 - 撤销/重做：会话内快照栈（上限 100）；用 Terra Draw 自带能力时**先核对锁定版本 API**，不凭记忆写。
-- 属性表单**一次做全**：`kind`、主名/多语言名、`rank`、`min_zoom/max_zoom`（留空=继承）、`description`、`attrs`（按 `attrs_schema` 用 `@json-editor/json-editor` 渲染）。
+- 属性表单**一次做全**：`kind`、主名/多语言名、`rank`、`min_zoom/max_zoom`（留空=继承）、`description`、`attrs`。
+- **属性表单在左栏**：作为左栏“属性”分节，放在工具栏下方；选中标注或生成草稿即切换为编辑表单，保存/取消/删除按钮同区；右侧 `#sidebar` 在编辑态只保留只读详情。
 - 名称编辑：至少一个主名（`is_primary`）；可加任意语种与别名；不能删到零个。
-- 保存：一次提交一个或多个要素 → 服务端逐条校验 → 返回逐要素错误（部分成功要明确列出）。
+- 保存（阶段 A）：只把这些编辑结果合成导出文件（`annotations.json` + `geometry.geojson`），不发请求。
+- 保存（阶段 B 起）：一次提交一个或多个要素 → 服务端逐条校验 → 返回逐要素错误（部分成功要明确列出）。
 - 软删除 + 恢复；删除需二次确认。
 - 锚点拖动：线/面标注的 `lon/lat` 可拖动优化位置，不影响几何。
 
 ## 4. 保存协议
 
-开发阶段（TASK-0009）先写**临时测试库**，不碰 `world/`：
+阶段 A（本分支）：**不落库**。编辑器只维护内存草稿，提供“导出 JSON”；导出文件格式与下面链路一致，后续可直接 `mapcreator annotations import`。
+
+阶段 B 起（TASK-0009 后续）再写**临时测试库**，不碰 `world/`：
 
 - 启动：`uv run mapcreator serve --editable --editor-db var/editor-test/annotations.db`；未加 `--editable` 时不挂写端点。
 - 临时库**跨重启保留**，不清空；首次启动若库为空，从当前 `build/annotations.export.json` 播种。
@@ -100,14 +114,18 @@ PATCH /api/annotations/anno.city.silverrun
 
 ## 9. 验收
 
-TASK-0009（临时测试库 → 正式库）：
+阶段 A（本分支，纯前端 UI）：
 
-- [ ] 浏览/编辑共用一套外壳；浏览模式无工具栏/绘制手柄；桌面 1280/1440/1920 无溢出。
+- [ ] 浏览/编辑共用一套外壳；浏览模式无工具栏/绘制手柄/保存按钮；桌面 1280×720 无溢出。
 - [ ] 创建/编辑/删除点、线、面；拖拽锚点、顶点编辑、吸附生效。
-- [ ] 属性卡含 kind、主名/多语言名、rank、min/max zoom、description、attrs；非法输入被拒绝并就地显示。
+- [ ] 属性编辑在**左栏**（kind、主名/多语言名、rank、min/max zoom、description、attrs）；非法输入被拒绝并就地显示；右侧详情保持只读。
 - [ ] 撤销/重做覆盖绘制、拖拽与属性修改。
+- [ ] 导出 `annotations.json` + `geometry.geojson`，可被 `mapcreator annotations import` 接受。
+- [ ] 刷新页面后草稿清空且界面回到空态（不产生报错）。
+
+阶段 B/C（后续分支，落库）：
+
 - [ ] 保存到 `var/editor-test/annotations.db`，重启 `serve --editable` 后仍在；`world/annotations.db` 修改时间不变。
-- [ ] 导出 JSON 可被 `mapcreator annotations import` 接受。
 
 正式库追加验收：
 

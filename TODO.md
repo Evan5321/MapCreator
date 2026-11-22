@@ -117,6 +117,7 @@
 - **Scope**：`/api/search`、搜索 UI、flyTo+高亮、`/api/query`（`--enable-sql`）。
 - **Acceptance**：中/英/别名/2 字词可搜；p95 ≤ 100 ms；只读 SQL 拒绝非 SELECT；非法 SQL 有明确错误。
 - **Deps**：TASK-0007
+- **分支**：**不在 `feat/civ-atlas-ui` 做**（该分支只做 UI）。
 
 ## M3 浏览/编辑界面
 
@@ -134,16 +135,28 @@
 - **Deps**：TASK-0007
 - **方案**：[`docs/CIV_ATLAS_UI_PORT.md`](docs/CIV_ATLAS_UI_PORT.md)
 
-### `[ ]` TASK-0009 编辑器与写库
+### `[ ]` TASK-0009 编辑器（阶段 A：编辑界面；阶段 B/C：落库）
 
-- **Scope**：`editor.js`（Terra Draw）、`history.js`、`pick.js`；点/线/面绘制、选择/拖拽/删除、顶点编辑、撤销/重做、完整属性卡；dev-only 写端点先只写临时库 `var/editor-test/annotations.db`（跨重启保留、首次从当前构建播种），线/面几何存 `var/editor-test/geometry/`；最后把同一写路径升级到 `world/annotations.db`（`revision` 409、软删除/恢复、几何引用 409、级联删除）。
+> 分支约定：`feat/civ-atlas-ui` **只做 UI**——不写 TASK-0008 的搜索/只读 SQL，也不写后端写端点。本分支只做阶段 A。
+
+**阶段 A（本分支，纯前端）**：
+
+- **Scope**：`editor.js`（Terra Draw + 官方适配器 `terra-draw-maplibre-gl`）、`pick.js`、`history.js`、`inspector.js`；工具条（选择/点/线/面/删除）、选择/拖拽/删除、顶点编辑、撤销/重做、**左栏属性编辑**、导出 `annotations.json` + `geometry.geojson`。
 - **Acceptance**：
-  - [ ] 点/线/面各创建一条并保存；重启 `serve --editable` 后数据仍在；`world/annotations.db` 修改时间不变。
-  - [ ] 属性卡含 kind、主名/多语言名、rank、min/max zoom、description、attrs；非法输入就地报错。
-  - [ ] 撤销/重做覆盖绘制、拖拽与属性修改；导出 JSON 可被 `annotations import` 接受。
-  - [ ] 正式库部分见 [`EDITOR.md`](docs/EDITOR.md) §9 全部勾选。
-  - [ ] 桌面端 1280/1440/1920 截图无溢出。
-- **Deps**：TASK-0008
+  - [ ] 浏览模式仍无编辑控件；切到编辑态才挂工具条与绘制手柄。
+  - [ ] 点/线/面各画一条；拖拽锚点、顶点编辑、吸附生效。
+  - [ ] 属性编辑在左栏（kind、主名/多语言名、rank、min/max zoom、description、attrs），非法输入就地报错；右侧详情保持只读。
+  - [ ] 撤销/重做覆盖绘制、拖拽与属性修改。
+  - [ ] 导出 JSON 可被 `mapcreator annotations import` 接受。
+  - [ ] 1280×720 截图无溢出；`npm run check`、`npm run build` 通过。
+- **Deps**：TASK-0013
+- **视觉验证数据**：`worlds/metro`（地铁演示世界，已入库）可用 `uv run mapcreator build --root worlds/metro` 重建产物后观察绘制/标签；不属验收数据。
+
+**阶段 B（后续分支，临时库）**：dev-only 写端点（`serve --editable`）+ `var/editor-test/annotations.db`（跨重启保留、首次从构建播种）+ `var/editor-test/geometry/`；`world/annotations.db` 永不被打开。
+
+**阶段 C（后续分支，正式库）**：写 `world/annotations.db`；`revision` 409、软删除/恢复、几何引用 409、级联删除。
+
+- **Deps（B/C）**：TASK-0008
 - **方案**：[`docs/CIV_ATLAS_UI_PORT.md`](docs/CIV_ATLAS_UI_PORT.md)、[`docs/EDITOR.md`](docs/EDITOR.md)
 
 ## M4 交通与运维
@@ -178,7 +191,7 @@
 | `[ ]` 真实世界内容 | 地名、密度、首批地区 | M1 之后 | 需要人类提供数据或生成规则 |
 | `[ ]` 图标集选型 | 视觉规格、许可证 | 不阻塞 | 先用 Maki 风格占位 |
 | `[ ]` 撤销历史持久化 | 是否跨会话保留 | M3 | 先只做会话内 |
-| `[ ]` 多世界 | 是否支持切换 `world/` | 不阻塞 | 先假定单世界 |
+| `[ ]` 多世界 | 是否支持切换 `world/` | 不阻塞 | 先假定单世界；`worlds/metro` 只是演示数据集，未开启多世界 |
 
 ## 与 v0.2 契约的编号映射
 
