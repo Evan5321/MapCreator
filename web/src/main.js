@@ -7,8 +7,11 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { getAnnotation } from './api.js';
+import { createEditor } from './editor.js';
 import { bandForZoom, initMap } from './map.js';
-import { hideDetail, renderDetail, renderDetailError, setStatus } from './ui.js';
+import { createShell } from './shell.js';
+import { bindShortcuts } from './shortcuts.js';
+import { hideDetail, renderDetail, renderDetailError } from './ui.js';
 
 /** 测试模式暴露的只读探针（E2E 断言用，见 docs/TESTING.md §4）。 */
 const app = {
@@ -19,6 +22,9 @@ const app = {
   visibleLabelCount: 0,
   selectedId: null,
   lang: null,
+  mode: 'browse',
+  tool: 'select',
+  draftCount: 0,
 };
 
 /**
@@ -71,12 +77,104 @@ async function bootstrap() {
     );
     const layers = pointLayers.filter((layer) => map.getLayer(layer) !== undefined);
 
+    const shell = createShell({
+      world,
+      map,
+      onSelect: (id) => select(id),
+      onKindVisibility: (kind, visible) => labels.setKindVisible(kind, visible),
+    });
+
     app.band = bandForZoom(map.getZoom(), world.bands);
     await labels.setBand(app.band);
+    shell.setBand(app.band);
+    shell.setAnnotations(labels.list());
+
+    const editor = createEditor({
+      map,
+      world,
+      onStatus: (text) => shell.setStatus(text),
+      onProbe: (state) => {
+        app.mode = state.enabled ? 'edit' : 'browse';
+        app.tool = state.tool;
+        app.draftCount = state.draftCount;
+      },
+      onSelection: (draft) => {
+        if (!draft) {
+          app.selectedId = null;
+          shell.setSelected(null);
+          hideDetail();
+          labels.refresh();
+          updateStatus();
+          writeHash(map);
+          return;
+        }
+        app.selectedId = draft.annotationId;
+        shell.setSelected(app.selectedId);
+        renderDraftDetail(draft);
+        labels.refresh();
+        updateStatus();
+        writeHash(map);
+      },
+    });
+
+    /**
+     * 用草稿数据渲染右侧只读详情。
+     * @param {any} draft
+     */
+    function renderDraftDetail(draft) {
+      const primary = draft.names.find((/** @type {any} */ item) => item.is_primary);
+      renderDetail(
+        {
+          id: draft.annotationId ?? `draft:${draft.key}`,
+          kind: draft.kind,
+          lon: draft.lon,
+          lat: draft.lat,
+          rank: draft.rank,
+          label_mode: draft.labelMode,
+          min_zoom: draft.min_zoom,
+          max_zoom: draft.max_zoom,
+          primary_name: primary?.name || null,
+          default_lang: world.world.default_lang,
+          names: draft.names.map((/** @type {any} */ item) => ({
+            lang: item.lang,
+            name: item.name,
+            role: item.role ?? 'name',
+            is_primary: Boolean(item.is_primary),
+          })),
+          description: draft.description || null,
+          attrs: draft.attrs ?? {},
+          geometry_id: draft.geometryId,
+          color: world.kinds[draft.kind]?.color ?? null,
+        },
+        { lang: app.lang },
+      );
+    }
 
     /** @param {string} id */
     async function select(id) {
       app.selectedId = id;
+      shell.setSelected(id);
+      if (editor.isEnabled()) {
+        const local = editor.selectAnnotation(id);
+        if (local) {
+          renderDraftDetail(local);
+          labels.refresh();
+          updateStatus();
+          writeHash(map);
+          return;
+        }
+        try {
+          const detail = await getAnnotation(id);
+          renderDetail(detail, { lang: app.lang });
+          editor.addExisting(detail);
+        } catch (error) {
+          renderDetailError(id, error);
+        }
+        labels.refresh();
+        updateStatus();
+        writeHash(map);
+        return;
+      }
       try {
         const detail = await getAnnotation(id);
         renderDetail(detail, { lang: app.lang });
@@ -90,7 +188,9 @@ async function bootstrap() {
 
     function clearSelection() {
       app.selectedId = null;
+      shell.setSelected(null);
       hideDetail();
+      if (editor.isEnabled()) editor.clearSelection();
       labels.refresh();
       updateStatus();
       writeHash(map);
@@ -101,9 +201,10 @@ async function bootstrap() {
       app.zoom = map.getZoom();
       app.center = { lon: center.lng, lat: center.lat };
       app.visibleLabelCount = labels.visible();
+      const mode = app.mode === 'edit' ? `编辑 · ${app.tool}` : '浏览';
       const selection = app.selectedId ? ` · 选中 ${app.selectedId}` : '';
-      setStatus(
-        `${app.band} · z${app.zoom.toFixed(2)} · ${world.world.name} · 标签 ${app.visibleLabelCount}${selection}`,
+      shell.setStatus(
+        `${mode} · ${app.band} · z${app.zoom.toFixed(2)} · ${world.world.name} · 标签 ${app.visibleLabelCount}${selection}`,
       );
     };
 
@@ -120,7 +221,11 @@ async function bootstrap() {
       const band = bandForZoom(map.getZoom(), world.bands);
       if (band !== app.band) {
         app.band = band;
-        labels.setBand(band).then(sync);
+        labels.setBand(band).then(() => {
+          shell.setBand(band);
+          shell.setAnnotations(labels.list());
+          sync();
+        });
       } else {
         labels.refresh();
         sync();
@@ -128,6 +233,7 @@ async function bootstrap() {
     });
 
     map.on('click', (event) => {
+      if (app.mode === 'edit') return;
       const hits = layers.length > 0 ? map.queryRenderedFeatures(event.point, { layers }) : [];
       const hit = hits[0];
       if (hit) {
@@ -139,6 +245,7 @@ async function bootstrap() {
     });
 
     map.on('mousemove', (event) => {
+      if (app.mode === 'edit') return;
       const hits = layers.length > 0 ? map.queryRenderedFeatures(event.point, { layers }) : [];
       map.getCanvas().style.cursor = hits.length > 0 ? 'pointer' : '';
     });
@@ -146,7 +253,46 @@ async function bootstrap() {
     const closeButton = document.getElementById('detail-close');
     closeButton?.addEventListener('click', clearSelection);
 
+    const modeButton = document.getElementById('btn-mode');
+    const exportButton = document.getElementById('btn-export');
+
+    /**
+     * @param {'browse' | 'edit'} mode
+     */
+    function setMode(mode) {
+      if (mode === 'edit') {
+        editor.enable();
+        shell.setMode('edit');
+        app.mode = 'edit';
+        if (modeButton) modeButton.textContent = '退出编辑';
+        if (exportButton) exportButton.hidden = false;
+        updateStatus();
+        return;
+      }
+      editor.disable();
+      shell.setMode('browse');
+      app.mode = 'browse';
+      if (modeButton) modeButton.textContent = '进入编辑';
+      if (exportButton) exportButton.hidden = true;
+      clearSelection();
+    }
+
+    modeButton?.addEventListener('click', () => {
+      setMode(editor.isEnabled() ? 'browse' : 'edit');
+    });
+    exportButton?.addEventListener('click', () => editor.exportDownload());
+
+    bindShortcuts({
+      Escape: () => {
+        if (editor.handleEscape()) return;
+        if (app.selectedId) clearSelection();
+      },
+    });
+
     app.ready = true;
+    // 测试探针：编辑器状态与导出内容（E2E 断言用）。
+    app.editorProbe = () => editor.probe();
+    app.exportPayload = () => editor.exportPayload();
     sync();
 
     const initialSelection = initial?.params.get('sel');
@@ -172,7 +318,8 @@ async function bootstrap() {
       }
     });
   } catch (error) {
-    setStatus(`启动失败：${String(error)}`);
+    const status = document.getElementById('statusbar');
+    if (status) status.textContent = `启动失败：${String(error)}`;
     throw error;
   }
 }

@@ -1,0 +1,1454 @@
+{
+  "annotations": [
+    {
+      "id": "anno.station.s001",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.3972,
+      "rank": 3,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "領林洲",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s002",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.408,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "馬灣",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s003",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.4194,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "貝安",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s004",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.4314,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "馬前井",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s005",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.444,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "南海洋馬路",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s006",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.4566,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "自由洲",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s007",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.4704,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "北海洋馬路",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s008",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.4842,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "書明宮",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s009",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.498,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "漁港",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s010",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.5124,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "立工境",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s011",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.528,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "邊水",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s012",
+      "kind": "station",
+      "lon": 11.895,
+      "lat": 8.5484,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "京丁門",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s013",
+      "kind": "station",
+      "lon": 11.9208,
+      "lat": 8.5868,
+      "rank": 3,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "里水",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s014",
+      "kind": "station",
+      "lon": 11.946,
+      "lat": 8.5868,
+      "rank": 3,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "海關總署",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s015",
+      "kind": "station",
+      "lon": 11.9676,
+      "lat": 8.5868,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "華光",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s016",
+      "kind": "station",
+      "lon": 11.9886,
+      "lat": 8.5868,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "西灘",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s017",
+      "kind": "station",
+      "lon": 12.006,
+      "lat": 8.5868,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "聖德萬里",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s018",
+      "kind": "station",
+      "lon": 12.0234,
+      "lat": 8.5868,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "茶竹橋",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s019",
+      "kind": "station",
+      "lon": 12.0408,
+      "lat": 8.5868,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "德員",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s020",
+      "kind": "station",
+      "lon": 12.0582,
+      "lat": 8.5868,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "畢帝",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s021",
+      "kind": "station",
+      "lon": 12.0756,
+      "lat": 8.5868,
+      "rank": 3,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "維安大橋",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s022",
+      "kind": "station",
+      "lon": 12.0918,
+      "lat": 8.5868,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "東堤水城",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s023",
+      "kind": "station",
+      "lon": 12.1074,
+      "lat": 8.5868,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "佧以哈地",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s024",
+      "kind": "station",
+      "lon": 12.1218,
+      "lat": 8.5868,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "時代獨立",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s025",
+      "kind": "station",
+      "lon": 12.1356,
+      "lat": 8.5844,
+      "rank": 3,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "遠城南",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s026",
+      "kind": "station",
+      "lon": 12.1344,
+      "lat": 8.432,
+      "rank": 3,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "國際會展中心",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s027",
+      "kind": "station",
+      "lon": 12.06,
+      "lat": 8.4344,
+      "rank": 2,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "油程大橋",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s028",
+      "kind": "station",
+      "lon": 11.979,
+      "lat": 8.4794,
+      "rank": 2,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "千馳戶",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s029",
+      "kind": "station",
+      "lon": 11.949,
+      "lat": 8.4884,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "急錫谷",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s030",
+      "kind": "station",
+      "lon": 11.9088,
+      "lat": 8.4614,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "急錫谷門前",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s031",
+      "kind": "station",
+      "lon": 12.057,
+      "lat": 8.543,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "三太子",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s032",
+      "kind": "station",
+      "lon": 12.0444,
+      "lat": 8.555,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "三太子門前",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s033",
+      "kind": "station",
+      "lon": 12.06,
+      "lat": 8.5676,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "途郁加加",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s034",
+      "kind": "station",
+      "lon": 12.06,
+      "lat": 8.5724,
+      "rank": 3,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "安林多喬",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s035",
+      "kind": "station",
+      "lon": 12.06,
+      "lat": 8.5292,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "旺瑪獨安",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s036",
+      "kind": "station",
+      "lon": 12.06,
+      "lat": 8.51,
+      "rank": 3,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "加中州集團",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s037",
+      "kind": "station",
+      "lon": 12.06,
+      "lat": 8.4704,
+      "rank": 2,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "加中州城",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s038",
+      "kind": "station",
+      "lon": 12.042,
+      "lat": 8.4884,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "華通國閣",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s039",
+      "kind": "station",
+      "lon": 11.997,
+      "lat": 8.4884,
+      "rank": 3,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "新中華門",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s040",
+      "kind": "station",
+      "lon": 12.0288,
+      "lat": 8.51,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "成一先生紀念堂",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s041",
+      "kind": "station",
+      "lon": 12.087,
+      "lat": 8.51,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "四五坊",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s042",
+      "kind": "station",
+      "lon": 12.108,
+      "lat": 8.4704,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "入馬",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s043",
+      "kind": "station",
+      "lon": 11.94,
+      "lat": 8.4476,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "南加山",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s044",
+      "kind": "station",
+      "lon": 12.06,
+      "lat": 8.414,
+      "rank": 3,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "油程國際機場",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s045",
+      "kind": "station",
+      "lon": 12.087,
+      "lat": 8.4212,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "三英",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s046",
+      "kind": "station",
+      "lon": 12.06,
+      "lat": 8.4008,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "離境大廳",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s047",
+      "kind": "station",
+      "lon": 12.018,
+      "lat": 8.393,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "動國灣",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s048",
+      "kind": "station",
+      "lon": 12.042,
+      "lat": 8.393,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "萬洋",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s049",
+      "kind": "station",
+      "lon": 12.069,
+      "lat": 8.393,
+      "rank": 4,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "萬洋碼頭",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s050",
+      "kind": "station",
+      "lon": 12.048,
+      "lat": 8.3984,
+      "rank": 5,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "T1航站楼",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s051",
+      "kind": "station",
+      "lon": 12.024,
+      "lat": 8.3984,
+      "rank": 5,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "T2航站楼",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.s052",
+      "kind": "station",
+      "lon": 12.0,
+      "lat": 8.3984,
+      "rank": 5,
+      "label_mode": "point",
+      "names": [
+        {
+          "lang": "zh",
+          "name": "T3航站楼",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.station.placeholder_01",
+      "kind": "station",
+      "lon": 11.8854,
+      "lat": 8.5376,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_02",
+      "kind": "station",
+      "lon": 11.9028,
+      "lat": 8.51,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_03",
+      "kind": "station",
+      "lon": 11.9115,
+      "lat": 8.5322,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_04",
+      "kind": "station",
+      "lon": 11.9286,
+      "lat": 8.564,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_05",
+      "kind": "station",
+      "lon": 11.94,
+      "lat": 8.51,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_06",
+      "kind": "station",
+      "lon": 11.9544,
+      "lat": 8.51,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_07",
+      "kind": "station",
+      "lon": 11.9688,
+      "lat": 8.51,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_08",
+      "kind": "station",
+      "lon": 11.9856,
+      "lat": 8.51,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_09",
+      "kind": "station",
+      "lon": 12.0,
+      "lat": 8.51,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_10",
+      "kind": "station",
+      "lon": 12.0144,
+      "lat": 8.51,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_11",
+      "kind": "station",
+      "lon": 12.036,
+      "lat": 8.564,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_12",
+      "kind": "station",
+      "lon": 12.048,
+      "lat": 8.564,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_13",
+      "kind": "station",
+      "lon": 12.078,
+      "lat": 8.564,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_14",
+      "kind": "station",
+      "lon": 12.096,
+      "lat": 8.564,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_15",
+      "kind": "station",
+      "lon": 12.114,
+      "lat": 8.564,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_16",
+      "kind": "station",
+      "lon": 12.108,
+      "lat": 8.54,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_17",
+      "kind": "station",
+      "lon": 12.108,
+      "lat": 8.522,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_18",
+      "kind": "station",
+      "lon": 12.006,
+      "lat": 8.4704,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_19",
+      "kind": "station",
+      "lon": 12.03,
+      "lat": 8.4704,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_20",
+      "kind": "station",
+      "lon": 11.988,
+      "lat": 8.453,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_21",
+      "kind": "station",
+      "lon": 11.979,
+      "lat": 8.432,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_22",
+      "kind": "station",
+      "lon": 11.994,
+      "lat": 8.432,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_23",
+      "kind": "station",
+      "lon": 12.018,
+      "lat": 8.432,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_24",
+      "kind": "station",
+      "lon": 12.036,
+      "lat": 8.432,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_25",
+      "kind": "station",
+      "lon": 12.096,
+      "lat": 8.432,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_26",
+      "kind": "station",
+      "lon": 12.114,
+      "lat": 8.432,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_27",
+      "kind": "station",
+      "lon": 11.922,
+      "lat": 8.4884,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_28",
+      "kind": "station",
+      "lon": 11.94,
+      "lat": 8.4704,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_29",
+      "kind": "station",
+      "lon": 11.958,
+      "lat": 8.4704,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_30",
+      "kind": "station",
+      "lon": 12.036,
+      "lat": 8.4704,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_31",
+      "kind": "station",
+      "lon": 12.048,
+      "lat": 8.414,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_32",
+      "kind": "station",
+      "lon": 12.048,
+      "lat": 8.408,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_33",
+      "kind": "station",
+      "lon": 12.072,
+      "lat": 8.414,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_34",
+      "kind": "station",
+      "lon": 12.078,
+      "lat": 8.402,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_35",
+      "kind": "station",
+      "lon": 12.0,
+      "lat": 8.393,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_36",
+      "kind": "station",
+      "lon": 12.06,
+      "lat": 8.393,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_37",
+      "kind": "station",
+      "lon": 11.949,
+      "lat": 8.393,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.station.placeholder_38",
+      "kind": "station",
+      "lon": 11.925,
+      "lat": 8.459,
+      "rank": 5,
+      "label_mode": "none",
+      "names": []
+    },
+    {
+      "id": "anno.metro_line.island_ring",
+      "kind": "metro_line",
+      "lon": 11.9886,
+      "lat": 8.5868,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.island_ring",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#E0392D"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "環島線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.jiatong",
+      "kind": "metro_line",
+      "lon": 11.979,
+      "lat": 8.51,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.jiatong",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#E99642"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "加通線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.quancheng",
+      "kind": "metro_line",
+      "lon": 12.06,
+      "lat": 8.5292,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.quancheng",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#87FBFD"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "荃成線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.huanzhong",
+      "kind": "metro_line",
+      "lon": 12.06,
+      "lat": 8.4704,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.huanzhong",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#302CF4"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "環中線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.wantong",
+      "kind": "metro_line",
+      "lon": 12.084,
+      "lat": 8.459,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.wantong",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#6BA7EE"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "萬通線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.zhongxin",
+      "kind": "metro_line",
+      "lon": 12.06,
+      "lat": 8.4704,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.zhongxin",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#E346F6"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "中心通線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.youcheng",
+      "kind": "metro_line",
+      "lon": 12.06,
+      "lat": 8.414,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.youcheng",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#8EC45A"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "油程線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.meilin",
+      "kind": "metro_line",
+      "lon": 11.997,
+      "lat": 8.4884,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.meilin",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#61AF78"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "美林線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.xie_xie",
+      "kind": "metro_line",
+      "lon": 12.06,
+      "lat": 8.51,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.xie_xie",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#583C20"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "及協線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.weian1",
+      "kind": "metro_line",
+      "lon": 12.06,
+      "lat": 8.5772,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.weian1",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#776047"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "維安1線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.digui",
+      "kind": "metro_line",
+      "lon": 12.108,
+      "lat": 8.459,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.digui",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#4E4E4E"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "地軌快通線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.muhai",
+      "kind": "metro_line",
+      "lon": 12.12,
+      "lat": 8.444,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.muhai",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#BA9C73"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "木海線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.fugui",
+      "kind": "metro_line",
+      "lon": 12.06,
+      "lat": 8.51,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.fugui",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#8AEDEF"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "浮軌線路",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.huanmushen",
+      "kind": "metro_line",
+      "lon": 11.949,
+      "lat": 8.586797,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.huanmushen",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#F3D44C"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "環木神線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.metro_line.mushenshe",
+      "kind": "metro_line",
+      "lon": 11.9676,
+      "lat": 8.582,
+      "rank": 3,
+      "label_mode": "line",
+      "geometry_id": "geo.metro.mushenshe",
+      "attrs": {
+        "mode": "metro",
+        "line_color": "#B9365A"
+      },
+      "names": [
+        {
+          "lang": "zh",
+          "name": "木神涉通線",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.airport.youcheng",
+      "kind": "airport",
+      "lon": 12.06,
+      "lat": 8.414,
+      "rank": 3,
+      "names": [
+        {
+          "lang": "zh",
+          "name": "油程國際機場",
+          "is_primary": true
+        }
+      ]
+    },
+    {
+      "id": "anno.port.wanyang",
+      "kind": "port",
+      "lon": 12.069,
+      "lat": 8.393,
+      "rank": 4,
+      "names": [
+        {
+          "lang": "zh",
+          "name": "萬洋碼頭",
+          "is_primary": true
+        }
+      ]
+    }
+  ]
+}

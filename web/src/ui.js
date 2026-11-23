@@ -1,7 +1,8 @@
 // @ts-check
 /**
- * 面板与状态栏：详情面板（多语言名称、坐标、有效缩放、attrs）与状态文字。
+ * 面板：右侧详情（多语言名称、坐标、有效缩放、attrs）。
  * 只做 DOM 渲染，不发请求；数据由 main.js 通过 /api/annotations/{id} 取回。
+ * 左栏与状态栏归 shell.js。
  */
 
 /**
@@ -85,12 +86,6 @@ export function renderDetailError(id, error) {
 export function hideDetail() {
   const sidebar = document.getElementById('sidebar');
   if (sidebar) sidebar.hidden = true;
-}
-
-/** @param {string} text */
-export function setStatus(text) {
-  const el = document.getElementById('statusbar');
-  if (el) el.textContent = text;
 }
 
 /**

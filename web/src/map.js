@@ -23,9 +23,11 @@ export async function initMap(container, view = {}, options = {}) {
   const world = await getWorld();
   const style = await getStyle();
   resolveSources(style);
+  // 注意：不能显式传 `zoom: undefined`。MapLibre 的 jumpTo 用 `'zoom' in options` 判断，
+  // 显式 undefined 会被转成 NaN，初始化时矩阵求逆失败（failed to invert matrix）。
   const camera = view.center
     ? { center: [view.center.lon, view.center.lat], zoom: view.zoom ?? 4 }
-    : { bounds: world.bounds ?? undefined, zoom: view.zoom };
+    : { bounds: world.bounds ?? undefined };
 
   const map = new maplibregl.Map({
     container,
@@ -35,7 +37,7 @@ export async function initMap(container, view = {}, options = {}) {
     maxZoom: 17,
     attributionControl: false,
   });
-  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left');
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
 
   await new Promise((resolve, reject) => {
     map.once('load', () => resolve(undefined));

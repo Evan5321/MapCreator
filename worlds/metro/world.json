@@ -1,0 +1,78 @@
+{
+  "$schema": "../schemas/world.schema.json",
+  "schema_version": 1,
+  "world": {
+    "id": "aetheria",
+    "name": "Aetheria",
+    "default_lang": "zh"
+  },
+  "layers": [
+    {
+      "id": "land",
+      "file": "geometry/land.geojson",
+      "geometry": [
+        "Polygon",
+        "MultiPolygon"
+      ],
+      "order": 10
+    },
+    {
+      "id": "water",
+      "file": "geometry/water.geojson",
+      "geometry": [
+        "Polygon",
+        "MultiPolygon"
+      ],
+      "order": 20
+    },
+    {
+      "id": "parks",
+      "file": "geometry/parks.geojson",
+      "geometry": [
+        "Polygon",
+        "MultiPolygon"
+      ],
+      "order": 30
+    },
+    {
+      "id": "terrain",
+      "file": "geometry/terrain.geojson",
+      "geometry": [
+        "Polygon",
+        "LineString"
+      ],
+      "order": 40
+    },
+    {
+      "id": "rivers",
+      "file": "geometry/rivers.geojson",
+      "geometry": [
+        "LineString",
+        "MultiLineString"
+      ],
+      "order": 50
+    },
+    {
+      "id": "roads",
+      "file": "geometry/roads.geojson",
+      "geometry": [
+        "LineString",
+        "MultiLineString"
+      ],
+      "order": 60
+    },
+    {
+      "id": "transit",
+      "file": "geometry/transit.geojson",
+      "geometry": [
+        "LineString",
+        "MultiLineString"
+      ],
+      "order": 70
+    }
+  ],
+  "counts": {
+    "features": 0,
+    "annotations": 0
+  }
+}

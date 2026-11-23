@@ -1,7 +1,8 @@
 # 项目状态（STATUS）
 
-- **当前里程碑**：M1（浏览与分级标注）——**TASK-0003 ~ TASK-0007 完成**，`serve` 可浏览分级地图并点选查看详情
-- **最近更新**：2026-11-19
+- **当前分支**：`feat/civ-atlas-ui` 只做 **UI 界面**（浏览界面 + 编辑界面）；不写 TASK-0008 搜索/只读 SQL，也不写任何后端写端点
+- **当前里程碑**：M1 完成（TASK-0003 ~ TASK-0007），TASK-0013 浏览外壳与 TASK-0009 阶段 A（纯前端编辑器）已完成；下一步 TASK-0008（另分支），编辑落库阶段 B/C 留后续分支
+- **最近更新**：2026-11-23
 - **维护规则**：每完成一个任务更新本文件；只写事实与证据，不写计划口号（计划在 `TODO.md`）。
 
 ## 已完成
@@ -65,14 +66,36 @@
   - [server/app.py](../src/mapcreator/server/app.py)：`create_app(db_path=...)`，默认 `world/annotations.db`。
   - 前端：[ui.js](../web/src/ui.js) 详情面板（全部语种叠加、当前语种高亮、坐标/有效缩放/rank/几何/revision/attrs）；[map.js](../web/src/map.js) 点击查询与 `pointLayers`；[labels.js](../web/src/labels.js) 标签可点击、DOM 选中圆环（WebGL circle filter 在实测中未显示，改用 DOM 环，见 ADR-022）；[main.js](../web/src/main.js) `#z/lat/lon?sel=&lang=` 完整读写与 hashchange 同步、`window.__app.selectedId`。
   - 测试：[test_server.py](../tests/integration/test_server.py) 覆盖详情 200（kind 默认 zoom）、404、503；详情库在 tmp 中通过 `repo.init_schema` + `upsert_annotation` 构造。
+- **TASK-0013 UI 外壳（浏览，2026-11-19，纯前端）**：
+  - 新增 [shell.js](../web/src/shell.js)（顶栏/左栏/状态栏装配，左栏顺序 图层 → 标注列表 → 世界信息）、[panels.js](../web/src/panels.js)（可折叠分节、开关行、列表行、统计表、空态）、[layers.js](../web/src/layers.js)（把 `build/style.json` 的图层 ID 映射成底图/线状/点标注三组开关）、[shortcuts.js](../web/src/shortcuts.js)（按 `event.code` 绑定，输入控件内不拦截）。
+  - 点标注开关联动 [labels.js](../web/src/labels.js) 的 `hiddenKinds`：`setLayoutProperty('visibility')` 关 WebGL 点层的同时剔除 DOM 标签，两者不会不一致；`list()` 暴露当前带标注摘要供左栏列表使用。
+  - [index.html](../web/index.html) 重排为地图全幅 + `#topbar` + `#leftbar`（`#sidebar` 保留为右侧详情）；[style.css](../web/src/style.css) 改为深色现代电子地图配色（分节、开关、列表、状态栏），桌面端 ≥1280×720，右侧详情与状态栏无遮挡。
+  - [main.js](../web/src/main.js) 装配外壳：选中同步（地图点选/标签点击/列表行三者共用 `select()`）、`Escape` 清选中、带切换时刷新列表、状态栏改由 `shell.setStatus` 输出；`ui.js` 移除 `setStatus`，只保留详情面板。
+  - **修复启动崩溃**：生产构建下若 `initMap` 显式传 `zoom: undefined`，MapLibre 的 `jumpTo` 以 `'zoom' in options` 判断，会把它算成 `NaN` 并在 `_calcMatrices` 抛 `failed to invert matrix`，整页白屏。[map.js](../web/src/map.js) 改为「无 center 时不传 zoom」。
+  - 浏览模式不挂载任何编辑组件；工具栏/绘制/属性卡仍属 [TASK-0009](TODO.md)。
+- **TASK-0009 阶段 A 纯前端编辑器（2026-11-23，已验收）**：
+  - 新增 [history.js](../web/src/history.js)（100 份快照、去重、撤销/重做）与 [inspector.js](../web/src/inspector.js)（kind、多语言主名、rank、zoom、description、attrs 及就地校验）；[editor.js](../web/src/editor.js) 接入 Terra Draw 1.40.0 与官方 `terra-draw-maplibre-gl-adapter` 1.5.0，实现选择、点/线/面/矩形、拖拽、顶点编辑、删除和内存草稿。
+  - [shell.js](../web/src/shell.js)、[main.js](../web/src/main.js) 与 [index.html](../web/index.html) 接入浏览/编辑模式切换、导出按钮和测试探针；编辑态左栏顺序为工具 → 属性 → 图层 → 标注列表 → 世界信息，右侧详情保持只读。
+  - 导出 `annotations.json` 与 `geometry.geojson`；点标注遵守 D-015（仅 lon/lat、无 geometry_id），线/面标注关联 `geo.*`，几何 properties 仅含 kind。既有服务端标注可生成同 ID 的可编辑内存副本，不写后端。
+  - 刷新后草稿清空；属性、绘制、拖拽历史可撤销/重做；同绘制模式要素间顶点吸附通过运行时断言。
+- **演示世界 `worlds/metro`（2026-11-22，数据集，非产品功能）**：
+  - 按用户提供的地铁示意图构造；16 条线路（含 `有軌快車`）、52 个具名站 + 38 个空白椭圆占位站（`label_mode="none"`）、`airport`/`port` 各 1，共 18 个几何 / 107 条标注。
+  - 目录结构与 `tests/fixtures/mini-world` 同构：`world.json`、`annotations.json`、`annotations.sql`（逻辑 dump，107 行）、`geometry/*.geojson`；已纳入 git，`annotations.db` 与 `annotations.export.json` 由 `.gitignore` 排除。
+  - 构建：`validate --root worlds/metro` ok；`build --root worlds/metro` → `build_version=0.1.0+7158dde243cf`，6 带标签数 `0/0/15/68/68/53`。
+  - 持久化：Agent 环境无法创建文件型 SQLite（`CREATE TABLE` 被静默丢弃、库恒 0 字节），改为内存库走 `db/repo.py` 产出 `annotations.sql`；人类终端 `db restore --in worlds/metro/annotations.sql --db worlds/metro/annotations.db` 已物化（147456 B）。
+  - 样式修复：[style.py](../src/mapcreator/build/style.py) 的 transit 图层原按几何 `kind` 匹配 `metro_line`（永不命中）且带 `line-dasharray`，导致整网同色虚线；改为 `["coalesce", ["get", "line_color"], palette.metro]` 并去掉虚线，线路按数据配色。
+  - 已知偏差：`world.json` 复用 `world.id=aetheria`（构建要求与 `config/world.toml` 一致）；线路走向为示意图近似，未逐段对位。
 
 ## 未完成 / 阻塞
 
 | 状态 | 项 | 影响 |
 |---|---|---|
 | 未做 | `#sel=` 的 Playwright E2E 断言（`window.__app.selectedId` 已就绪） | 目前靠手工浏览器验证，属 TASK-0011 |
+| 未复测 | 浏览外壳的 `Ctrl+\` 收起、单个 kind 开关、`重置视图` 按钮、跨带列表刷新 | 均为纯前端行为，代码已就位；需要在真实浏览器手工点一遍 |
 | 未做 | `check --full` / `screenshot` / `query` / `openapi` / `format` 仍为占位 | 返回 `NOT_IMPLEMENTED`（退出码 4），属 TASK-0008/0010/0011 |
+| 未执行 | 编辑器导出文件的真实 `annotations import` SQLite 写库导入 | 导入共用的 `load_export` 已通过 3 条标注校验；真实写库需由人类终端执行 |
 | 未做 | 每带几何裁剪与 source 卸载（当前几何为单一 `unified.geojson`） | 大数据量时的载荷/内存优化，属 TASK-0012 |
+| 未做 | CLI `serve` 无 `--db`/`--root` 参数（`create_app` 支持 `db_path` 注入） | 演示世界 `worlds/metro` 的站点详情 404，只能用默认 `world/annotations.db` |
 | 未做 | 真实世界内容（`world/` 几何为空） | 真实 `build` 仅含 8 条标注点，暂无几何要素 |
 | 未核对 | `docs/ENVIRONMENT.md` 的许可证为初判 | 需人工逐项核对许可证文本 |
 
@@ -83,19 +106,31 @@
 | ~~本机 D: 盘 SQLite 写入静默丢失~~（**2026-11-19 已定位，非磁盘问题**）：`DELETE`/`WAL` 下 `commit()` 后 DB 0 字节、残留 512 B journal，重开即 `no such table` | 仅影响 **Agent 运行环境**；人类自有终端完全正常（`db init` 成功、106496 字节、无残留） | 根因：Agent 环境拦截文件删除（`os.unlink()` 返回成功但文件仍在），SQLite 的热日志无法清理，下次打开被回滚。**处置：`db`/`annotations` 等写库命令放到人类终端执行**，无需 TRUNCATE/迁盘/白名单 |
 | mypy 1.19+ 默认 SQLite 缓存，在本机触发 `no such table: main.files2` 内部错误 | `mypy src` 无法执行 | `pyproject.toml` 设 `sqlite_cache = false`（文件系统缓存）；mypy 2.x 另有版本问题，dev 依赖限制 `<2` |
 | `npm ci` 与 `npm install` 不可并发 | 并发会 `ENOTEMPTY`，`.bin` 丢失 | 安装脚本串行执行；失败后删 `node_modules` 重跑 `npm ci` |
-| 还没创建首次 git commit | 无历史可回滚 | remote 已配置为 `origin` → `https://github.com/Evan5321/MapCreator.git`（远端为空）；首次提交由人类确认后执行 |
+| 分支 `feat/civ-atlas-ui` 已推送（`origin/feat/civ-atlas-ui`），但当前工作区仍有未提交改动 | 无历史可回滚到「本轮 UI 改动之前」 | 提交由人类决定；`build/`、`dist/`、DB、截图不入库 |
 | 沙箱内 `bash` 起不来（signal pipe 被拒） | `install-deps.sh` 的语法未在本机验证 | 由人类在 Git Bash/WSL 首次运行时确认 |
-| Agent 沙箱内 Playwright 启动失败：`EPERM mkdtemp`（`%TEMP%` 不可写） | 我无法在 Agent 内跑通浏览器启动/E2E | 二进制已就位；由人类在自己的终端跑一次启动验证 |
+| Agent 沙箱内 Playwright 使用系统 `%TEMP%` 时可能 `EPERM mkdtemp`，`browser.close()` 也可能卡住 | 默认配置会阻止浏览器启动或退出 | E2E 前把 `TEMP`/`TMP` 指向 `var/tmp`；脚本用 `page.close()` 或 `with sync_playwright()` 收尾，不调用 `browser.close()` |
 
 ## 下一步
 
-1. **TASK-0008**：搜索与只读 SQL（`/api/search`、`/api/query`）。
-2. **TASK-0011**：Playwright E2E（`window.__app.selectedId` 断言、启动验证）。
-3. 人工项（可并行）：Chromium 启动验证、`ENVIRONMENT.md` 许可证核对、首次提交与 `git push -u origin main`。
+1. **提交**：由人类审阅并提交 TASK-0013、演示世界与 TASK-0009 阶段 A 改动；`build/`、`web/dist/`、DB、截图和 `var/` 证据不入库。
+2. **后续分支**：TASK-0008 搜索与只读 SQL（当前分支不做）。
+3. **后续分支**：TASK-0009 阶段 B/C（临时库写端点 → 正式库），届时由人类终端补跑真实导入/写库验收。
+4. **TASK-0011**：把 `var/tmp/editor_e2e*.py` 的断言固化为正式 Playwright E2E，并接入 `check --full`；**TASK-0012** 性能优化。
 
 ## 最近证据
 
+- PR #1 mypy 修复（2026-11-23）：CI 只发现 25 个源码文件并报 `mapcreator.build` 缺少类型，根因是 `.gitignore` 的无锚点 `build/` 误忽略了 `src/mapcreator/build/` 整个源码包。规则已收紧为根目录 `/build/` 与 `/build.old/`，6 个既有构建源码文件恢复为待提交；复核 Ruff 全通过、66 个文件格式正确、mypy 31 文件无问题。
+- PR #1 CI 修复（2026-11-23）：`pyproject.toml` 显式声明 Ruff `known-first-party=["mapcreator"]`，消除 Ubuntu 对导入分组的自动识别差异；`test_style.py` 同步为线路优先使用数据 `line_color`、缺失回退 metro 色的既定行为。本地 `ruff check . --no-cache`、`ruff format --check .`、mypy 31 文件、pytest 46 项全部通过。默认 world 的 `validate` 仍报 `anno.metro_line.blue` 引用了不存在的 `geo.metro.blue`；CI 此步为 `continue-on-error`，留待数据修复，不在本次 lint/测试修正中改真源。
+- TASK-0009 阶段 A 门禁（2026-11-23）：`npm run check` → 20 files、0 问题；`npm run build` → 21 modules、退出码 0（Vite 仅提示 bundle >500 kB）；Python `load_export(var/tmp/editor-export/annotations.json)` → 3 条标注全部通过，ID 为 `anno.city.harbor_point` / `anno.road.main_road` / `anno.park.green_park`，点 geometry_id=None，线/面关联对应几何。未执行真实 SQLite 写库导入。
+- TASK-0009 阶段 A 浏览器（Playwright，1280×720，`http://127.0.0.1:8767/`）：主 E2E 34 项 + 补充 E2E 29 项全部通过，console/page 错误均为 `[]`；覆盖浏览态隔离、点/线/面/矩形、属性校验与多语言、拖拽/顶点编辑/吸附、撤销/重做、删除、下载、刷新清空、既有标注内存副本。日志为 `var/tmp/editor_e2e.log`、`var/tmp/editor_e2e_extra.log`；截图为 `var/screenshots/editor-{browse,edit,browse-after,extra,snap}-1280.png`，均已读取核对。
+- 演示世界（2026-11-22）：`validate --root worlds/metro --json` → ok（18 几何 / 107 标注）；`build --root worlds/metro --json` → `build_version=0.1.0+7158dde243cf`，6 带标签数 `0/0/15/68/68/53`；内存库 `dump_sql` → `restore_sql` → `verify_dump` 返回 `[]`，dump 54 KB。
+- 演示世界浏览器（Playwright，1440×900 / 1280×800，`http://127.0.0.1:8766/`）：`window.__app.ready=true`、状态栏 `z10-12 · z11.00 · Aetheria · 标签 50`、左栏 69 行、无 `PAGEERROR`；16 条线路按 `line_color` 分色；截图 `var/tmp/metro-1440.png`、`var/tmp/metro-1280.png`（已逐张查看）。未验证：站点详情 404（`serve` 未接 `--db`）。
 - TASK-0007 门禁：`ruff format --check .` / `ruff check .` / `mypy src` 全绿；`uv run pytest -q` → `46 passed, 1 skipped`（跳过项为 TASK-0011 E2E；唯一 warning 来自 FastAPI TestClient 的第三方弃用提示）；`npm run check` 通过；`npm run build` 产出新 bundle。
+- TASK-0013 门禁（前端）：`npm run check` → `Checked 18 files in 245ms. No fixes applied.`；`npm run build` → `dist/assets/index-Dqz9IUYj.js` 820.73 kB（Vite 提示 >500 kB，非错误）。后端未改，Python 门禁沿用 TASK-0007 结果。
+- TASK-0013 浏览器（Playwright，1280×720，`http://127.0.0.1:8765/`）：`window.__app.ready=true`；左栏分节顺序 `['图层','标注列表','世界信息']`；左栏底部 664px < 视口 720px（无溢出）；状态栏 `z4-6 · z6.93 · Aetheria · 标签 2`。
+- TASK-0013 交互：点列表行「烬堡」→ `selectedId=anno.city.emberhold`、`location.hash=#6.93/9.00581/12.25000?sel=anno.city.emberhold`、右侧详情标题「烬堡」（ZH 烬堡 / EN Emberhold、ID、坐标 13.600000 9.200000、显示缩放 z4–z13、rank 2、点标注无几何、修订 2）；关闭「全部点标注」→ `labels 0 / labelNodes 0`（WebGL 点层与 DOM 标签同步隐藏）；带 `?sel=` 刷新 → 选中与详情面板自动恢复。
+- TASK-0013 截图（`var/` 已忽略，不提交）：`var/tmp/1-initial.png`（初始三栏 + 两个标签）、`var/tmp/2-selected.png`（右侧详情）、`var/tmp/3-points-off.png`（点标注关闭）、`var/tmp/4-collapsed.png`（左栏收起）；截图已逐张人工查看。
+- TASK-0013 遗留：`Ctrl+\` 收起、单 kind 开关、`重置视图`、跨带列表刷新未单独复测（代码已就位，见「未完成 / 阻塞」）。
 - TASK-0007 API：`/api/annotations/anno.city.silverrun` → 200（双语名称、`min_zoom 4 / max_zoom 13`）；`/api/annotations/anno.school.brook` → 200（`12/17`）；缺失 ID → 404 `ANNOTATION_NOT_FOUND`；`db_path` 不存在 → 503 `DB_MISSING`。
 - TASK-0007 浏览器：`http://127.0.0.1:8765/?v=9#13.00/8.55/12.08?sel=anno.school.brook&lang=en` → 侧栏标题 "Brook School"、ZH 溪畔小学 主名 / EN Brook School、显示缩放 z12–z17、点选圆环可见、状态栏 `z13-15 · z13.00 · Aetheria · 标签 1 · 选中 anno.school.brook`，地址栏保留 `sel`；截图 `c:\Users\liyunlin\AppData\Local\Temp\trae\screenshots\brook_school_selected.jpg`。
 - TASK-0006 门禁：`ruff format --check .` / `ruff check .` / `mypy src` 全绿；`uv run pytest -q` → `44 passed, 1 skipped`；`npm run check` → `Checked 14 files`；`npm run build` → `web/dist`（index + assets）。

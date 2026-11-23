@@ -57,6 +57,9 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 # 本项目文档与注释以中文为主，属于噪音，统一关闭。
 ignore = ["E501", "RUF001", "RUF002", "RUF003"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["mapcreator"]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101"]
 # Typer 的选项必须写成 `typer.Option(...)` 作为默认值，B008 是该框架的固定误报。

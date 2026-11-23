@@ -9,7 +9,7 @@
 | 里程碑 | 交付物 | 验收标准 | 状态 |
 |---|---|---|---|
 | **M0 骨架与契约** | 仓库结构、CLI 骨架、config、schema、mini-world、`doctor`/`check`、Web 构建 | `doctor` 全绿；`check` 通过；`serve` 显示可缩放样例 | `[~]` |
-| **M1 浏览与分级标注** | 构建合并视图、MapLibre 页面、缩放带、点/线标注、碰撞、点选详情、URL 状态 | z0→z17 正常；标注按规则出现/消失；无控制台错误 | `[ ]` |
+| **M1 浏览与分级标注** | 构建合并视图、MapLibre 页面、缩放带、点/线标注、碰撞、点选详情、URL 状态 | z0→z17 正常；标注按规则出现/消失；无控制台错误 | `[x]` |
 | **M2 搜索与 SQL** | FTS5/RTree、搜索 API/UI、只读 SQL、导入导出、dump/restore | 中/英/别名可搜（含 2 字词）；dump 往返一致 | `[ ]` |
 | **M3 编辑器** | Terra Draw 点/线/面、属性表单、保存校验、撤销/重做、软删除 | 三类几何可增删改；非法输入被拒；刷新可见 | `[ ]` |
 | **M4 交通与运维** | relation、地铁/公交线路与有序站点、QGIS 往返、批量导入、审计日志 | 5 站线路可渲染；往返不丢字段 | `[ ]` |
@@ -117,14 +117,48 @@
 - **Scope**：`/api/search`、搜索 UI、flyTo+高亮、`/api/query`（`--enable-sql`）。
 - **Acceptance**：中/英/别名/2 字词可搜；p95 ≤ 100 ms；只读 SQL 拒绝非 SELECT；非法 SQL 有明确错误。
 - **Deps**：TASK-0007
+- **分支**：**不在 `feat/civ-atlas-ui` 做**（该分支只做 UI）。
 
-## M3 编辑器
+## M3 浏览/编辑界面
 
-### `[ ]` TASK-0009 编辑器
+### `[x]` TASK-0013 UI 外壳（浏览）
 
-- **Scope**：`web/src/editor.js`（Terra Draw）、JSON Editor 表单、写接口、撤销/重做、软删除、409 冲突。
-- **Acceptance**：见 [`EDITOR.md`](docs/EDITOR.md) §9 全部勾选。
-- **Deps**：TASK-0008
+- **Goal**：把现有地图页升级为现代电子地图风格的三栏外壳，浏览模式只读。
+- **Scope**：`web/src/shell.js`、`panels.js`、`layers.js`、`shortcuts.js`；顶栏、左栏（图层 → 标注列表 → 世界信息，可收起）、右侧详情重排、状态栏；`index.html`/`style.css` 重排；桌面端（≥1280×720）。
+- **Out of scope**：编辑工具栏/绘制/属性卡（TASK-0009）；搜索框（TASK-0008）。
+- **Acceptance**：
+  - [x] 浏览模式只渲染地图与只读面板，**不出现**工具栏/绘制控件。
+  - [x] 左栏顺序为图层、标注列表、世界信息；按钮可收起（`Ctrl+\` 由 `shortcuts.js` 绑定，输入控件内不拦截，未单独复测）；图层开关生效（点标注 kind 同时隐藏 WebGL 点层与 DOM 标签）。
+  - [x] 详情面板保留 TASK-0007 行为（多语种、`#sel=`/`#lang=`、点选与关闭）；带 `#sel=` 刷新后自动恢复。
+  - [x] 1280×720 下无溢出/遮挡；`npm run check`、`npm run build` 通过；附截图。
+- **Evidence**（2026-11-19）：`npm run check` → 18 files 0 问题；`npm run build` → `dist/assets/index-Dqz9IUYj.js`；Playwright 1280×720 断言 `sections=['图层','标注列表','世界信息']`、左栏底部 664 < 720、点选后 `selectedId=anno.city.emberhold` 且详情标题「烬堡」、关闭「全部点标注」后 `labels 0 / labelNodes 0`。截图见 `STATUS.md` 最近证据。
+- **Deps**：TASK-0007
+- **方案**：[`docs/CIV_ATLAS_UI_PORT.md`](docs/CIV_ATLAS_UI_PORT.md)
+
+### `[~]` TASK-0009 编辑器（阶段 A：编辑界面；阶段 B/C：落库）
+
+> 分支约定：`feat/civ-atlas-ui` **只做 UI**——不写 TASK-0008 的搜索/只读 SQL，也不写后端写端点。本分支只做阶段 A。
+
+**阶段 A（本分支，纯前端，2026-11-23 已完成）**：
+
+- **Scope**：`editor.js`（Terra Draw + 官方适配器 `terra-draw-maplibre-gl-adapter`）、`history.js`、`inspector.js`；工具条（选择/点/线/面/矩形/删除）、选择/拖拽/删除、顶点编辑、撤销/重做、**左栏属性编辑**、导出 `annotations.json` + `geometry.geojson`。
+- **Acceptance**：
+  - [x] 浏览模式仍无编辑控件；切到编辑态才挂工具条与绘制手柄。
+  - [x] 点/线/面各画一条；拖拽锚点、顶点编辑、同绘制模式要素间吸附生效。
+  - [x] 属性编辑在左栏（kind、主名/多语言名、rank、min/max zoom、description、attrs），非法输入就地报错；右侧详情保持只读。
+  - [x] 撤销/重做覆盖绘制、拖拽与属性修改。
+  - [x] 导出 JSON 通过 `mapcreator annotations import` 共用的 `load_export` 校验。
+  - [x] 1280×720 截图无页面溢出；`npm run check`、`npm run build` 通过。
+- **Evidence**：主 E2E 34 项、补充 E2E 29 项全部通过，无 console/page 错误；截图与导出校验详见 `docs/STATUS.md`。真实 SQLite 写库导入未执行（Agent 写库限制）。
+- **Deps**：TASK-0013
+- **视觉验证数据**：`worlds/metro`（地铁演示世界，已入库）可用 `uv run mapcreator build --root worlds/metro` 重建产物后观察绘制/标签；不属验收数据。
+
+**阶段 B（后续分支，临时库）**：dev-only 写端点（`serve --editable`）+ `var/editor-test/annotations.db`（跨重启保留、首次从构建播种）+ `var/editor-test/geometry/`；`world/annotations.db` 永不被打开。
+
+**阶段 C（后续分支，正式库）**：写 `world/annotations.db`；`revision` 409、软删除/恢复、几何引用 409、级联删除。
+
+- **Deps（B/C）**：TASK-0008
+- **方案**：[`docs/CIV_ATLAS_UI_PORT.md`](docs/CIV_ATLAS_UI_PORT.md)、[`docs/EDITOR.md`](docs/EDITOR.md)
 
 ## M4 交通与运维
 
@@ -158,11 +192,11 @@
 | `[ ]` 真实世界内容 | 地名、密度、首批地区 | M1 之后 | 需要人类提供数据或生成规则 |
 | `[ ]` 图标集选型 | 视觉规格、许可证 | 不阻塞 | 先用 Maki 风格占位 |
 | `[ ]` 撤销历史持久化 | 是否跨会话保留 | M3 | 先只做会话内 |
-| `[ ]` 多世界 | 是否支持切换 `world/` | 不阻塞 | 先假定单世界 |
+| `[ ]` 多世界 | 是否支持切换 `world/` | 不阻塞 | 先假定单世界；`worlds/metro` 只是演示数据集，未开启多世界 |
 
 ## 与 v0.2 契约的编号映射
 
-`DEVELOPMENT_PREP.md` §12.2 列了 10 个任务（0001–0010），这里拆成 12 个：把"详情与 URL 状态"从原 TASK-0006 中独立、把"性能优化"从原 M5 中独立。对应关系：
+`DEVELOPMENT_PREP.md` §12.2 列了 10 个任务（0001–0010），这里拆成 13 个：把"详情与 URL 状态"从原 TASK-0006 中独立、把"性能优化"从原 M5 中独立，并新增 civ-atlas 浏览外壳（编辑器仍在原编号 TASK-0009 内）。对应关系：
 
 | 原编号 | 本文件 |
 |---|---|
@@ -177,6 +211,7 @@
 | 0009 测试与证据 | TASK-0011 |
 | 0010 QGIS 往返 + 文档收尾 | TASK-0010 |
 | （新增）性能优化 | TASK-0012 |
+| （新增）civ-atlas 浏览外壳 | TASK-0013 |
 
 ## 维护规则
 

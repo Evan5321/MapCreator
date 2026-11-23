@@ -8,7 +8,13 @@
  * @typedef {{
  *   id?: string | number,
  *   geometry: { coordinates: [number, number] },
- *   properties: { name?: string, kind?: string, rank?: number },
+ *   properties: {
+ *     name?: string,
+ *     kind?: string,
+ *     rank?: number,
+ *     min_zoom?: number,
+ *     max_zoom?: number,
+ *   },
  * }} LabelFeature
  */
 
@@ -31,6 +37,8 @@ export function createLabelLayer(map, world, loadBand, options = {}) {
 
   /** @type {LabelFeature[]} */
   let features = [];
+  /** @type {Set<string>} 被图层开关隐藏的 kind（DOM 标签跟随 WebGL 点层）。 */
+  const hiddenKinds = new Set();
   /** @type {string | null} */
   let band = null;
   let scheduled = false;
@@ -54,6 +62,7 @@ export function createLabelLayer(map, world, loadBand, options = {}) {
     for (const feature of features) {
       const text = feature.properties.name || '';
       if (!text) continue;
+      if (feature.properties.kind && hiddenKinds.has(feature.properties.kind)) continue;
       const size = sizeFor(feature.properties.rank ?? 3, zoom);
       const point = map.project(feature.geometry.coordinates);
       const w = text.length * size * 0.95 + 8;
@@ -73,7 +82,11 @@ export function createLabelLayer(map, world, loadBand, options = {}) {
 
     const selectedId = options.getSelectedId?.() ?? null;
     const selected = selectedId
-      ? features.find((feature) => String(feature.id) === selectedId)
+      ? features.find(
+          (feature) =>
+            String(feature.id) === selectedId &&
+            !(feature.properties.kind && hiddenKinds.has(feature.properties.kind)),
+        )
       : undefined;
     if (selected) {
       const point = map.project(selected.geometry.coordinates);
@@ -146,6 +159,22 @@ export function createLabelLayer(map, world, loadBand, options = {}) {
     setBand,
     /** @returns {number} 当前实际显示的标签数 */
     visible: () => visible,
+    /** 当前带的标注摘要（左栏列表用）。 */
+    list: () =>
+      features.map((feature) => ({
+        id: feature.id === undefined ? '' : String(feature.id),
+        name: feature.properties.name ?? '',
+        kind: feature.properties.kind ?? '',
+        rank: feature.properties.rank,
+        min_zoom: feature.properties.min_zoom,
+        max_zoom: feature.properties.max_zoom,
+      })),
+    /** @param {string} kind @param {boolean} visible */
+    setKindVisible: (kind, visible) => {
+      if (visible) hiddenKinds.delete(kind);
+      else hiddenKinds.add(kind);
+      place();
+    },
     /** 测试钩子：立即重排一次 */
     refresh: place,
   };
