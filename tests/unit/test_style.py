@@ -31,13 +31,18 @@ def test_style_uses_palette_and_generated_metadata(config: AppConfig) -> None:
         config.palette.line.river,
         config.palette.line.road,
         config.palette.transit.metro,
-        config.palette.transit.bus,
-        config.palette.transit.rail,
         *(token.color for token in config.palette.label_tokens.values()),
     }
     dumped = json.dumps(style, ensure_ascii=False)
     for color in palette_colors:
         assert color in dumped, color
+
+    transit_layer = next(layer for layer in style["layers"] if layer["id"] == "transit")
+    assert transit_layer["paint"]["line-color"] == [
+        "coalesce",
+        ["get", "line_color"],
+        config.palette.transit.metro,
+    ]
 
 
 def test_style_has_no_glyph_dependent_layers(config: AppConfig) -> None:

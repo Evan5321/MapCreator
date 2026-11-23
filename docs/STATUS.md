@@ -119,6 +119,7 @@
 
 ## 最近证据
 
+- PR #1 CI 修复（2026-11-23）：`pyproject.toml` 显式声明 Ruff `known-first-party=["mapcreator"]`，消除 Ubuntu 对导入分组的自动识别差异；`test_style.py` 同步为线路优先使用数据 `line_color`、缺失回退 metro 色的既定行为。本地 `ruff check . --no-cache`、`ruff format --check .`、mypy 31 文件、pytest 46 项全部通过。默认 world 的 `validate` 仍报 `anno.metro_line.blue` 引用了不存在的 `geo.metro.blue`；CI 此步为 `continue-on-error`，留待数据修复，不在本次 lint/测试修正中改真源。
 - TASK-0009 阶段 A 门禁（2026-11-23）：`npm run check` → 20 files、0 问题；`npm run build` → 21 modules、退出码 0（Vite 仅提示 bundle >500 kB）；Python `load_export(var/tmp/editor-export/annotations.json)` → 3 条标注全部通过，ID 为 `anno.city.harbor_point` / `anno.road.main_road` / `anno.park.green_park`，点 geometry_id=None，线/面关联对应几何。未执行真实 SQLite 写库导入。
 - TASK-0009 阶段 A 浏览器（Playwright，1280×720，`http://127.0.0.1:8767/`）：主 E2E 34 项 + 补充 E2E 29 项全部通过，console/page 错误均为 `[]`；覆盖浏览态隔离、点/线/面/矩形、属性校验与多语言、拖拽/顶点编辑/吸附、撤销/重做、删除、下载、刷新清空、既有标注内存副本。日志为 `var/tmp/editor_e2e.log`、`var/tmp/editor_e2e_extra.log`；截图为 `var/screenshots/editor-{browse,edit,browse-after,extra,snap}-1280.png`，均已读取核对。
 - 演示世界（2026-11-22）：`validate --root worlds/metro --json` → ok（18 几何 / 107 标注）；`build --root worlds/metro --json` → `build_version=0.1.0+7158dde243cf`，6 带标签数 `0/0/15/68/68/53`；内存库 `dump_sql` → `restore_sql` → `verify_dump` 返回 `[]`，dump 54 KB。
