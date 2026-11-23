@@ -20,8 +20,8 @@ dist/
 .vite/
 
 # ---- 构建与运行产物 ----
-build/
-build.old/
+/build/
+/build.old/
 .tmp-build/
 artifacts/
 logs/
