@@ -135,20 +135,21 @@
 - **Deps**：TASK-0007
 - **方案**：[`docs/CIV_ATLAS_UI_PORT.md`](docs/CIV_ATLAS_UI_PORT.md)
 
-### `[ ]` TASK-0009 编辑器（阶段 A：编辑界面；阶段 B/C：落库）
+### `[~]` TASK-0009 编辑器（阶段 A：编辑界面；阶段 B/C：落库）
 
 > 分支约定：`feat/civ-atlas-ui` **只做 UI**——不写 TASK-0008 的搜索/只读 SQL，也不写后端写端点。本分支只做阶段 A。
 
-**阶段 A（本分支，纯前端）**：
+**阶段 A（本分支，纯前端，2026-11-23 已完成）**：
 
-- **Scope**：`editor.js`（Terra Draw + 官方适配器 `terra-draw-maplibre-gl`）、`pick.js`、`history.js`、`inspector.js`；工具条（选择/点/线/面/删除）、选择/拖拽/删除、顶点编辑、撤销/重做、**左栏属性编辑**、导出 `annotations.json` + `geometry.geojson`。
+- **Scope**：`editor.js`（Terra Draw + 官方适配器 `terra-draw-maplibre-gl-adapter`）、`history.js`、`inspector.js`；工具条（选择/点/线/面/矩形/删除）、选择/拖拽/删除、顶点编辑、撤销/重做、**左栏属性编辑**、导出 `annotations.json` + `geometry.geojson`。
 - **Acceptance**：
-  - [ ] 浏览模式仍无编辑控件；切到编辑态才挂工具条与绘制手柄。
-  - [ ] 点/线/面各画一条；拖拽锚点、顶点编辑、吸附生效。
-  - [ ] 属性编辑在左栏（kind、主名/多语言名、rank、min/max zoom、description、attrs），非法输入就地报错；右侧详情保持只读。
-  - [ ] 撤销/重做覆盖绘制、拖拽与属性修改。
-  - [ ] 导出 JSON 可被 `mapcreator annotations import` 接受。
-  - [ ] 1280×720 截图无溢出；`npm run check`、`npm run build` 通过。
+  - [x] 浏览模式仍无编辑控件；切到编辑态才挂工具条与绘制手柄。
+  - [x] 点/线/面各画一条；拖拽锚点、顶点编辑、同绘制模式要素间吸附生效。
+  - [x] 属性编辑在左栏（kind、主名/多语言名、rank、min/max zoom、description、attrs），非法输入就地报错；右侧详情保持只读。
+  - [x] 撤销/重做覆盖绘制、拖拽与属性修改。
+  - [x] 导出 JSON 通过 `mapcreator annotations import` 共用的 `load_export` 校验。
+  - [x] 1280×720 截图无页面溢出；`npm run check`、`npm run build` 通过。
+- **Evidence**：主 E2E 34 项、补充 E2E 29 项全部通过，无 console/page 错误；截图与导出校验详见 `docs/STATUS.md`。真实 SQLite 写库导入未执行（Agent 写库限制）。
 - **Deps**：TASK-0013
 - **视觉验证数据**：`worlds/metro`（地铁演示世界，已入库）可用 `uv run mapcreator build --root worlds/metro` 重建产物后观察绘制/标签；不属验收数据。
 

@@ -167,7 +167,7 @@ select       : 点击命中 → 选中；拖动点 → 实时更新 lon/lat；De
 - civ-atlas 为 **AGPL-3.0-only**。若复制其代码/样式片段，本仓库作为衍生作品需按 AGPL 分发，并保留版权声明与许可文本；联网提供服务时需提供对应源码。
 - 本方案默认“参考交互、重写实现”，不直接复制源码；若后续决定复制，需在 `LICENSE`/`NOTICE` 与 `docs/DECISIONS.md` 中记录。
 - 不新增别的前端依赖：继续用原生 ES 模块 + MapLibre + 已登记的 `terra-draw@1.40`。
-- **新增（已获批准，未安装）**：`terra-draw-maplibre-gl`（Terra Draw 官方 MapLibre 适配器），版本需与 `terra-draw@1.40` 对齐；安装由人类终端执行，安装后登记 `DEPENDENCIES.md`。
+- **新增（已安装并接入）**：`terra-draw-maplibre-gl-adapter@1.5.0`（Terra Draw 官方 MapLibre 适配器；原拟包名在 npm 不存在），已登记 `DEPENDENCIES.md`。
 
 ## 9. 已确认决策
 
@@ -180,7 +180,7 @@ select       : 点击命中 → 选中；拖动点 → 实时更新 lon/lat；De
 7. **属性卡**：一次做全（kind、主名/多语言名、rank、min/max zoom、description、attrs）。
 8. **正式库**：本轮不写 `world/annotations.db`；正式写入留给后续阶段。
 9. **分支范围**（2026-11-19 追加）：`feat/civ-atlas-ui` 只做 UI（浏览 + 编辑），TASK-0008 搜索/只读 SQL 不在本分支；编辑界面阶段数据**只在浏览器内存**，用“导出 JSON”交付，不写后端、不建临时库。
-10. **属性编辑位置**（2026-11-19 追加，待实现）：节点属性从右侧详情面板**移到左栏**的“属性”分节；右侧详情在编辑态退化为只读（或隐藏）。左栏编辑态顺序暂定 工具 → 属性 → 图层 → 标注列表 → 世界信息，实现时按可用性确认。
-11. **绘制适配器**（2026-11-19 追加）：使用 Terra Draw 官方 MapLibre 适配器 `terra-draw-maplibre-gl`，不自研适配层；安装待人类执行。
+10. **属性编辑位置**（2026-11-23 已实现）：节点属性从右侧详情面板**移到左栏**的“属性”分节；右侧详情在编辑态退化为只读。左栏编辑态顺序已确认为 工具 → 属性 → 图层 → 标注列表 → 世界信息。
+11. **绘制适配器**（2026-11-23 更正包名并接入）：使用 Terra Draw 官方 MapLibre 适配器 `terra-draw-maplibre-gl-adapter@1.5.0`，不自研适配层。
 
 遗留风险：AGPL 合规取决于是否复制源码（默认重写）；Terra Draw 的撤销/顶点 API 需按锁定版本核对；临时库预览构建的具体命令在 TASK-0009 实现时确认。

@@ -147,6 +147,18 @@ export function createShell({ world, map, onSelect, onKindVisibility }) {
     if (status) status.textContent = text;
   }
 
+  /**
+   * 切换浏览/编辑模式的外观。编辑控件由 editor.js 自行挂载。
+   * @param {'browse' | 'edit'} mode
+   */
+  function setMode(mode) {
+    const editing = mode === 'edit';
+    if (subtitle) {
+      subtitle.textContent = editing ? '编辑模式 · 草稿仅存内存' : '浏览模式 · 只读';
+    }
+    document.body.classList.toggle('is-editing', editing);
+  }
+
   function toggleLeftbar() {
     const collapsed = leftbar?.classList.toggle('is-collapsed') ?? false;
     if (toggleButton) {
@@ -180,7 +192,7 @@ export function createShell({ world, map, onSelect, onKindVisibility }) {
 
   updateListSubtitle();
 
-  return { setAnnotations, setBand, setSelected, setStatus, toggleLeftbar };
+  return { setAnnotations, setBand, setSelected, setStatus, setMode, toggleLeftbar };
 }
 
 /**

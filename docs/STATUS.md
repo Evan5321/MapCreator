@@ -1,8 +1,8 @@
 # 项目状态（STATUS）
 
 - **当前分支**：`feat/civ-atlas-ui` 只做 **UI 界面**（浏览界面 + 编辑界面）；不写 TASK-0008 搜索/只读 SQL，也不写任何后端写端点
-- **当前里程碑**：M1 完成（TASK-0003 ~ TASK-0007），TASK-0013 浏览外壳已完成；`worlds/metro` 演示世界用于视觉核对（非产品功能）；下一步 TASK-0009 阶段 A（编辑界面，纯前端草稿 + 导出）
-- **最近更新**：2026-11-22
+- **当前里程碑**：M1 完成（TASK-0003 ~ TASK-0007），TASK-0013 浏览外壳与 TASK-0009 阶段 A（纯前端编辑器）已完成；下一步 TASK-0008（另分支），编辑落库阶段 B/C 留后续分支
+- **最近更新**：2026-11-23
 - **维护规则**：每完成一个任务更新本文件；只写事实与证据，不写计划口号（计划在 `TODO.md`）。
 
 ## 已完成
@@ -73,6 +73,11 @@
   - [main.js](../web/src/main.js) 装配外壳：选中同步（地图点选/标签点击/列表行三者共用 `select()`）、`Escape` 清选中、带切换时刷新列表、状态栏改由 `shell.setStatus` 输出；`ui.js` 移除 `setStatus`，只保留详情面板。
   - **修复启动崩溃**：生产构建下若 `initMap` 显式传 `zoom: undefined`，MapLibre 的 `jumpTo` 以 `'zoom' in options` 判断，会把它算成 `NaN` 并在 `_calcMatrices` 抛 `failed to invert matrix`，整页白屏。[map.js](../web/src/map.js) 改为「无 center 时不传 zoom」。
   - 浏览模式不挂载任何编辑组件；工具栏/绘制/属性卡仍属 [TASK-0009](TODO.md)。
+- **TASK-0009 阶段 A 纯前端编辑器（2026-11-23，已验收）**：
+  - 新增 [history.js](../web/src/history.js)（100 份快照、去重、撤销/重做）与 [inspector.js](../web/src/inspector.js)（kind、多语言主名、rank、zoom、description、attrs 及就地校验）；[editor.js](../web/src/editor.js) 接入 Terra Draw 1.40.0 与官方 `terra-draw-maplibre-gl-adapter` 1.5.0，实现选择、点/线/面/矩形、拖拽、顶点编辑、删除和内存草稿。
+  - [shell.js](../web/src/shell.js)、[main.js](../web/src/main.js) 与 [index.html](../web/index.html) 接入浏览/编辑模式切换、导出按钮和测试探针；编辑态左栏顺序为工具 → 属性 → 图层 → 标注列表 → 世界信息，右侧详情保持只读。
+  - 导出 `annotations.json` 与 `geometry.geojson`；点标注遵守 D-015（仅 lon/lat、无 geometry_id），线/面标注关联 `geo.*`，几何 properties 仅含 kind。既有服务端标注可生成同 ID 的可编辑内存副本，不写后端。
+  - 刷新后草稿清空；属性、绘制、拖拽历史可撤销/重做；同绘制模式要素间顶点吸附通过运行时断言。
 - **演示世界 `worlds/metro`（2026-11-22，数据集，非产品功能）**：
   - 按用户提供的地铁示意图构造；16 条线路（含 `有軌快車`）、52 个具名站 + 38 个空白椭圆占位站（`label_mode="none"`）、`airport`/`port` 各 1，共 18 个几何 / 107 条标注。
   - 目录结构与 `tests/fixtures/mini-world` 同构：`world.json`、`annotations.json`、`annotations.sql`（逻辑 dump，107 行）、`geometry/*.geojson`；已纳入 git，`annotations.db` 与 `annotations.export.json` 由 `.gitignore` 排除。
@@ -88,6 +93,7 @@
 | 未做 | `#sel=` 的 Playwright E2E 断言（`window.__app.selectedId` 已就绪） | 目前靠手工浏览器验证，属 TASK-0011 |
 | 未复测 | 浏览外壳的 `Ctrl+\` 收起、单个 kind 开关、`重置视图` 按钮、跨带列表刷新 | 均为纯前端行为，代码已就位；需要在真实浏览器手工点一遍 |
 | 未做 | `check --full` / `screenshot` / `query` / `openapi` / `format` 仍为占位 | 返回 `NOT_IMPLEMENTED`（退出码 4），属 TASK-0008/0010/0011 |
+| 未执行 | 编辑器导出文件的真实 `annotations import` SQLite 写库导入 | 导入共用的 `load_export` 已通过 3 条标注校验；真实写库需由人类终端执行 |
 | 未做 | 每带几何裁剪与 source 卸载（当前几何为单一 `unified.geojson`） | 大数据量时的载荷/内存优化，属 TASK-0012 |
 | 未做 | CLI `serve` 无 `--db`/`--root` 参数（`create_app` 支持 `db_path` 注入） | 演示世界 `worlds/metro` 的站点详情 404，只能用默认 `world/annotations.db` |
 | 未做 | 真实世界内容（`world/` 几何为空） | 真实 `build` 仅含 8 条标注点，暂无几何要素 |
@@ -102,18 +108,19 @@
 | `npm ci` 与 `npm install` 不可并发 | 并发会 `ENOTEMPTY`，`.bin` 丢失 | 安装脚本串行执行；失败后删 `node_modules` 重跑 `npm ci` |
 | 分支 `feat/civ-atlas-ui` 已推送（`origin/feat/civ-atlas-ui`），但当前工作区仍有未提交改动 | 无历史可回滚到「本轮 UI 改动之前」 | 提交由人类决定；`build/`、`dist/`、DB、截图不入库 |
 | 沙箱内 `bash` 起不来（signal pipe 被拒） | `install-deps.sh` 的语法未在本机验证 | 由人类在 Git Bash/WSL 首次运行时确认 |
-| Agent 沙箱内 Playwright 启动失败：`EPERM mkdtemp`（`%TEMP%` 不可写） | 我无法在 Agent 内跑通浏览器启动/E2E | 二进制已就位；由人类在自己的终端跑一次启动验证 |
+| Agent 沙箱内 Playwright 使用系统 `%TEMP%` 时可能 `EPERM mkdtemp`，`browser.close()` 也可能卡住 | 默认配置会阻止浏览器启动或退出 | E2E 前把 `TEMP`/`TMP` 指向 `var/tmp`；脚本用 `page.close()` 或 `with sync_playwright()` 收尾，不调用 `browser.close()` |
 
 ## 下一步
 
-1. **提交**：`worlds/metro/` 与 `.gitignore` 已 staged（未提交）；`build/`、DB、截图不入库。
-2. **TASK-0009 阶段 A**（本分支）：编辑界面——Terra Draw + 官方 MapLibre 适配器、工具条、点/线/面、拖拽/顶点编辑、撤销/重做、**左栏属性编辑**、导出 JSON；数据只存浏览器内存。可用 `build --root worlds/metro` 的产物做视觉核对。
-3. **后续分支**：TASK-0008 搜索与只读 SQL（当前分支不做）。
-4. **后续分支**：TASK-0009 阶段 B/C（临时库写端点 → 正式库）。
-5. **TASK-0011**：Playwright E2E（`window.__app.selectedId` 断言、启动验证）；**TASK-0012** 性能优化。
+1. **提交**：由人类审阅并提交 TASK-0013、演示世界与 TASK-0009 阶段 A 改动；`build/`、`web/dist/`、DB、截图和 `var/` 证据不入库。
+2. **后续分支**：TASK-0008 搜索与只读 SQL（当前分支不做）。
+3. **后续分支**：TASK-0009 阶段 B/C（临时库写端点 → 正式库），届时由人类终端补跑真实导入/写库验收。
+4. **TASK-0011**：把 `var/tmp/editor_e2e*.py` 的断言固化为正式 Playwright E2E，并接入 `check --full`；**TASK-0012** 性能优化。
 
 ## 最近证据
 
+- TASK-0009 阶段 A 门禁（2026-11-23）：`npm run check` → 20 files、0 问题；`npm run build` → 21 modules、退出码 0（Vite 仅提示 bundle >500 kB）；Python `load_export(var/tmp/editor-export/annotations.json)` → 3 条标注全部通过，ID 为 `anno.city.harbor_point` / `anno.road.main_road` / `anno.park.green_park`，点 geometry_id=None，线/面关联对应几何。未执行真实 SQLite 写库导入。
+- TASK-0009 阶段 A 浏览器（Playwright，1280×720，`http://127.0.0.1:8767/`）：主 E2E 34 项 + 补充 E2E 29 项全部通过，console/page 错误均为 `[]`；覆盖浏览态隔离、点/线/面/矩形、属性校验与多语言、拖拽/顶点编辑/吸附、撤销/重做、删除、下载、刷新清空、既有标注内存副本。日志为 `var/tmp/editor_e2e.log`、`var/tmp/editor_e2e_extra.log`；截图为 `var/screenshots/editor-{browse,edit,browse-after,extra,snap}-1280.png`，均已读取核对。
 - 演示世界（2026-11-22）：`validate --root worlds/metro --json` → ok（18 几何 / 107 标注）；`build --root worlds/metro --json` → `build_version=0.1.0+7158dde243cf`，6 带标签数 `0/0/15/68/68/53`；内存库 `dump_sql` → `restore_sql` → `verify_dump` 返回 `[]`，dump 54 KB。
 - 演示世界浏览器（Playwright，1440×900 / 1280×800，`http://127.0.0.1:8766/`）：`window.__app.ready=true`、状态栏 `z10-12 · z11.00 · Aetheria · 标签 50`、左栏 69 行、无 `PAGEERROR`；16 条线路按 `line_color` 分色；截图 `var/tmp/metro-1440.png`、`var/tmp/metro-1280.png`（已逐张查看）。未验证：站点详情 404（`serve` 未接 `--db`）。
 - TASK-0007 门禁：`ruff format --check .` / `ruff check .` / `mypy src` 全绿；`uv run pytest -q` → `46 passed, 1 skipped`（跳过项为 TASK-0011 E2E；唯一 warning 来自 FastAPI TestClient 的第三方弃用提示）；`npm run check` 通过；`npm run build` 产出新 bundle。

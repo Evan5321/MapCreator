@@ -53,6 +53,7 @@ desktop.ini
 .env.local
 
 # ---- 工具/沙箱临时残留（仓库根）----
+debug.log
 # 有名临时文件（如 tmp30_8i7fb）与 8 位随机名（如 5anzcaon、osyoxz3_）
 /tmp*
 /[a-z0-9_][a-z0-9_][a-z0-9_][a-z0-9_][a-z0-9_][a-z0-9_][a-z0-9_][a-z0-9_]
